@@ -1,0 +1,29 @@
+{
+  "name": "ecommerce",
+  "version": "1.0.0",
+  "description": "Ecommerce website 1, (INTRO and LEARN)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
+    "server": "nodemon index.js"
+  },
+  "keywords": [
+    "Node.js",
+    "Mongodb"
+  ],
+  "author": "Brian Mulwa (mw711990838@gmail.com)",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "body-parser": "^1.20.1",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "express-async-handler": "^1.2.0",
+    "jsonwebtoken": "^9.0.0",
+    "mongoose": "^6.9.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  }
+}
