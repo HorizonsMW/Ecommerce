@@ -1,1 +1,1 @@
-Ecommerce project using javascript and mongodb
+Ecommerce project backend using NodeJS and mongodb.
