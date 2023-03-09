@@ -1,4 +1,5 @@
-## This is an Ecommerce project backend built using <img src = "./images/nodejs.jpeg" height = "30PX" alt = "NodeJS"/> and  <img src = "./images/mongodb.png" height = "30PX" alt = "MongoDB"/>.
+## This is an Ecommerce project backend built using NodeJS and MongoDB
+<img src = "./images/nodejs.jpeg" height = "30PX" alt = "NodeJS"/>          <img src = "./images/mongodb.png" height = "30PX" alt = "MongoDB"/>.
 ---
 > The first stage which involved building the necessary APIs for user creation and management is complete. All parties interested in testing are welcome to do so.
 
