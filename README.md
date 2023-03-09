@@ -1,5 +1,5 @@
 ## This is an Ecommerce project backend built using NodeJS and MongoDB
-<img src = "./images/nodejs.jpeg" height = "30PX" alt = "NodeJS"/>          <img src = "./images/mongodb.png" height = "30PX" alt = "MongoDB"/>.
+<img src = "./images/nodejs.jpeg" height = "30PX" alt = "NodeJS"/>          <img src = "./images/mongodb.png" height = "30PX" alt = "MongoDB"/>
 ---
 > The first stage which involved building the necessary APIs for user creation and management is complete. All parties interested in testing are welcome to do so.
 
@@ -49,9 +49,9 @@ router.put("/unblock-user/:id",authMiddleware,isAdmin,unblockAUser);// ubblock a
 ![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E) ![Express.js](https://img.shields.io/badge/express.js-%23404d59.svg?style=for-the-badge&logo=express&logoColor=%2361DAFB) ![NodeJS](https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white) ![NPM](https://img.shields.io/badge/NPM-%23000000.svg?style=for-the-badge&logo=npm&logoColor=white) ![Postman](https://img.shields.io/badge/Postman-FF6C37?style=for-the-badge&logo=postman&logoColor=white)
 
 ## 🌐 Socials:
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-%230077B5.svg?logo=linkedin&logoColor=white)](https://linkedin.com/in/brian-mulwa-a700661a1/) [![Twitter](https://img.shields.io/badge/Twitter-%231DA1F2.svg?logo=Twitter&logoColor=white)](https://twitter.com/@marcobrayan4) 
+[<img src = "https://brand.linkedin.com/content/dam/me/business/en-us/amp/brand-site/v2/bg/LI-Logo.svg.original.svg" height = "30PX" alt = "LinkedIn" />](https://linkedin.com/in/brian-mulwa-a700661a1/) [<img src = "https://about.twitter.com/content/dam/about-twitter/en/brand-toolkit/brand-download-img-1.jpg.twimg.1920.jpg" height = "30PX" alt = "Twitter" />  ](https://twitter.com/@marcobrayan4) [<img src = "https://static.whatsapp.net/rsrc.php/v3/y7/r/DSxOAUB0raA.png" height = "30PX" alt = "Whatsapp" />](https://api.whatsapp.com/send/?phone=254711990838&text&type=phone_number&app_absent=0) 
 
-  ## 💰 You can help me by Donating
+  ## ☕ Buy me a coffee
   [![PayPal](https://img.shields.io/badge/PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://paypal.me/bw112030hound@protonmail.com) 
-
+  # **0711990838**   <img src = "./images/mpesa.jpeg" height = "30PX" alt = "NodeJS"/> 
 ## Kudos! Enjoy ❤️
