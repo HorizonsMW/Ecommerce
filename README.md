@@ -32,6 +32,9 @@ Build Info: {
 ```js 
 
 router.post("/register" ,createUser);//new user creation
+```
+Check the user model under [User Model](./models/userModel.js) for more info on the requirements for a user/admin
+```js
 router.post("/login",loginUserCtrl);// user login
 router.get("/logout",logout);// user logout
 router.get("/refresh",handleRefreshToken);//handle Refresh Token
