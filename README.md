@@ -27,6 +27,7 @@ Build Info: {
 
 
 ### Below is some useful testing info.
+To get started, run `npm run server` from the [root](./) directory
 > To test the User API, use the path `Localhost:PORT/api/user`
 
 ```js 
