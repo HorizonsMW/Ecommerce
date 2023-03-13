@@ -1,6 +1,8 @@
 ## This is an Ecommerce project backend built using NodeJS and MongoDB
 <img src = "./images/nodejs.jpeg" height = "30PX" alt = "NodeJS"/>          <img src = "./images/mongodb.png" height = "30PX" alt = "MongoDB"/>
 ---
+
+## Users API
 > The first stage which involved building the necessary APIs for user creation and management is complete. All parties interested in testing are welcome to do so.
 
 ### System requirements
@@ -49,6 +51,18 @@ router.put("/block-user/:id",authMiddleware,isAdmin,blockAUser);// block a user 
 router.put("/unblock-user/:id",authMiddleware,isAdmin,unblockAUser);// ubblock a user -  only admin can block/unblock user
 
 ```
+## Products API
+The product API is now set for testing. To test the API, use the route `/api/product`
+> Below is some more information
+```js
+router.post("/", authMiddleware, isAdmin, createProduct);//create a new product
+router.get("/dev", getAllProducts);//get all products, no fields ommited: for development purposes
+router.get("/products/", getAllProductsSorted);//get all products and sort accordingly
+router.get("/:id", getAProduct);//get a product
+router.put("/:id", authMiddleware, isAdmin, updateProduct);//update a product
+router.delete("/:id", authMiddleware, isAdmin, deleteAProduct);//delete a product
+```
+
 
 ![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E) ![Express.js](https://img.shields.io/badge/express.js-%23404d59.svg?style=for-the-badge&logo=express&logoColor=%2361DAFB) ![NodeJS](https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white) ![NPM](https://img.shields.io/badge/NPM-%23000000.svg?style=for-the-badge&logo=npm&logoColor=white) ![Postman](https://img.shields.io/badge/Postman-FF6C37?style=for-the-badge&logo=postman&logoColor=white)
 

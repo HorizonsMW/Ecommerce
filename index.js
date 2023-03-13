@@ -10,6 +10,7 @@ const cookieParser = require("cookie-parser");
 const morgan = require('morgan');
 const PORT = process.env.PORT || 4000;
 
+
 dbConnect();
 
 app.use(morgan('combined'));//log activity on the console
