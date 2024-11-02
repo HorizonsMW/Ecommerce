@@ -174,6 +174,7 @@ Content-Type: application/json
 ```
 
 ### 3.3 Remove from Cart
+> This deletes a product entirely from the cart, to reduce quantity, refer to 3.2 above.
 ```http
 DELETE /cart/remove/:productId
 Authorization: Bearer <token>
