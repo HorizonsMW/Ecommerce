@@ -8,6 +8,7 @@ const bodyParser = require('body-parser');
 const { notFound, errorHandler } = require('./middlewares/errorHandler');
 const cookieParser = require("cookie-parser");
 const morgan = require('morgan');
+const cartRouter = require("./routes/cartRoute");
 const PORT = process.env.PORT || 4000;
 
 
@@ -26,6 +27,7 @@ app.use(cookieParser());
 //users
 app.use("/api/user", authRouter);
 app.use("/api/product", productRouter);
+app.use("/api/cart", cartRouter);
 
 
 
