@@ -1,6 +1,6 @@
 const express = require("express");
-const { createUser, loginUserCtrl, getAllUsers, getAUser, deleteAUser, updateAUser,blockAUser,unblockAUser, handleRefreshToken, logout } = require("../controller/userCtrl");
-const { authMiddleware, isAdmin } = require("../middlewares/authMiddleware");
+const { createUser, loginUserCtrl, getAllUsers, getAUser, deleteAUser, updateAUser,blockAUser,unblockAUser, handleRefreshToken, logout } = require("../../controller/userCtrl");
+const { authMiddleware, isAdmin } = require("../../middlewares/authMiddleware");
 const router = express.Router();
 
 router.post("/register",createUser); //new user creation

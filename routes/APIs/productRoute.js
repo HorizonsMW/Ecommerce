@@ -1,7 +1,7 @@
 const express = require("express");
-const { createProduct, getAProduct, getAllProducts, updateProduct, deleteAProduct, getAllProductsSorted } = require("../controller/productCtrl");
+const { createProduct, getAProduct, getAllProducts, updateProduct, deleteAProduct, getAllProductsSorted } = require("../../controller/productCtrl");
 const router = express.Router();
-const { authMiddleware, isAdmin } = require("../middlewares/authMiddleware");
+const { authMiddleware, isAdmin } = require("../../middlewares/authMiddleware");
 
 router.post("/", authMiddleware, isAdmin, createProduct);//create a new product
 router.get("/dev", getAllProducts);//get all products, no fields ommited: for development purposes

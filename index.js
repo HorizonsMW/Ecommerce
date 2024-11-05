@@ -2,13 +2,13 @@ const express = require('express');
 const dbConnect = require('./config/dbConnect');
 const app = express();
 const dotenv = require('dotenv').config();
-const authRouter = require("./routes/authRoute");
-const productRouter = require("./routes/productRoute");
+const authRouter = require("./routes/APIs/authRoute");
+const productRouter = require("./routes/APIs/productRoute");
+const cartRouter = require("./routes/APIs/cartRoute");
 const bodyParser = require('body-parser');
 const { notFound, errorHandler } = require('./middlewares/errorHandler');
 const cookieParser = require("cookie-parser");
 const morgan = require('morgan');
-const cartRouter = require("./routes/cartRoute");
 const PORT = process.env.PORT || 4000;
 
 

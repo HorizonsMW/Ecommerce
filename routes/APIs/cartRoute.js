@@ -4,8 +4,8 @@ const {
     updateCartItem, 
     removeFromCart, 
     getCart 
-} = require("../controller/cartCtrl");
-const { authMiddleware } = require("../middlewares/authMiddleware");
+} = require("../../controller/cartCtrl");
+const { authMiddleware } = require("../../middlewares/authMiddleware");
 const router = express.Router();
 
 router.post("/add", authMiddleware, addToCart);
