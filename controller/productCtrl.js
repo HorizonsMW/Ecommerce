@@ -81,7 +81,8 @@ const getAllProducts = asyncHandler(async (req, res) => {
          * Another way to filter results is 
          * const allProducts = await Product.where("category").equals(req.query.category);*/
 
-        res.json(allProducts);//send output
+        //res.json(allProducts);//send output in JSON - for development
+        return allProducts; // Return the products
     } catch (error) {
         throw new Error(error);
     }

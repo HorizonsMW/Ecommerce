@@ -1,0 +1,47 @@
+<!-- views/partials/header.ejs -->
+<header>
+    <div class="desktop-nav">
+        <div class="firstRow">
+            <h1>Horizons</h1>
+            <div class="icon-container">
+                <a href="#" class="search-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.398 1.398l3.646 3.646a1 1 0 0 0 1.415-1.415l-3.646-3.646zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                    </svg>
+                </a>
+                <a href="#" class="fav-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart-fill" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314"/>
+                      </svg>
+                </a>
+                <a href="#" class="cart-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bag-fill" viewBox="0 0 16 16">
+                        <path d="M8 1a2.5 2.5 0 0 1 2.5 2.5V4h-5v-.5A2.5 2.5 0 0 1 8 1m3.5 3v-.5a3.5 3.5 0 1 0-7 0V4H1v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4z"/>
+                      </svg>
+                </a>
+            
+            </div>
+        </div>
+        <div class="secondRow">
+            <nav>
+                <ul>
+                    <li class="dropdown">
+                        <div class="dropdown-trigger"><a href="#">Categories ▼</a></div>
+                        <div class="dropdown-content">
+                            <a href="/category/electronics">Electronics</a>
+                            <a href="/category/clothing">Clothing</a>
+                            <a href="/category/books">Books</a>
+                            <a href="/category/sports">Sports</a>
+                        </div>
+                    </li>
+                    <li><div><a href="/home/">Home</a></div></li>
+                    <li><div><a href="/products?sort=date">Products</a></div></li>
+                    <li><div><a href="/about">About Us</a></div></li>
+                    <li><div><a href="/contact">Contact</a></div></li>
+                    <li><div><a href="/user/login">Login</a></div></li>
+                    <li><div><a href="/user/register">Register</a></div></li>
+                </ul>
+            </nav>
+        </div> 
+    </div>
+</header>

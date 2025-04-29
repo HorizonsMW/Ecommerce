@@ -1,0 +1,514 @@
+/* public/css/style.css */
+:root {
+    --primary-color: #000000; /* Changed primary color to black */
+    --secondary-color: #C72B32; /* Example secondary color */
+    --accent-color: #98A3A7; /* Example accent color */
+    --background-color: #FFFFFF; /* Set background color to white */
+    --text-color: #333333; /* Changed from #d8d8d8 for better readability */
+    --border-color: #bdc3c7; /* Example border color */
+}
+
+/* Import Apple Sans font (or a similar font) */
+@font-face {
+    font-family: 'Apple Sans';
+    src: local('Apple Sans'), local('San Francisco'), url('https://example.com/path/to/apple-sans.woff2') format('woff2'); /* Adjust the URL to the actual font file if available */
+}
+/* Add some margin to the body to prevent content from being hidden behind the fixed header */
+body {
+    margin-top: 60px; /* Adjust this value based on the height of your header */
+    font-family: 'Apple Sans', 'San Francisco', 'Nunito', sans-serif; /* Set Apple Sans as the default font with fallbacks */
+    font-optical-sizing: auto;
+    font-weight: 500;
+    font-style: normal;
+    background-color: var(--background-color); /* Set background color to white */
+    color: var(--text-color);
+}
+
+/* Style for the main content area */
+main {
+    padding-top: 20px; /* Add padding to the top of the main content */
+}
+.desktop-nav{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: var(--accent-color);
+    z-index: 1000;
+    padding: 10px 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.desktop-nav .secondRow,.firstRow{
+display: flex;
+}
+
+/* Style for the mobile navigation */
+.mobile-nav {
+    display: none; /* Hide mobile nav by default */
+    flex-direction: column; /* Stack items vertically */
+    align-items: center; /* Center items horizontally */
+    background-color: rgba(248, 248, 248, 0.9); /* Background color */
+    position: fixed; /* Fix position */
+    top: 0; /* Align to the top */
+    left: 0; /* Align to the left */
+    right: 0; /* Align to the right */
+    z-index: 1000; /* Ensure it stays above other content */
+    padding: 10px; /* Add some padding */
+    border-radius: 10px; /* Add rounded corners */
+}
+
+/* Style for the mobile nav container */
+.mobile-nav-container {
+    display: flex; /* Use flexbox for layout */
+    justify-content: space-between; /* Space between home button and hamburger */
+    width: 100%; /* Full width */
+}
+
+/* Style for the hamburger icon */
+.hamburger {
+    cursor: pointer; /* Change cursor to pointer */
+    font-size: 24px; /* Adjust size */
+}
+
+/* Style for the mobile menu */
+.mobile-menu {
+    display: none; /* Hide menu by default */
+    list-style: none; /* Remove default list styling */
+    padding: 0; /* Remove padding */
+    margin: 0; /* Remove margin */
+}
+
+/* Show mobile menu when active */
+.mobile-menu.active {
+    display: flex; /* Show menu */
+    flex-direction: column; /* Stack items vertically */
+    width: 100%; /* Full width */
+}
+
+/* Style for each mobile menu item */
+.mobile-menu li {
+    margin: 10px 0; /* Add space between items */
+}
+
+/* Show mobile nav on small screens */
+@media (max-width: 768px) {
+    .desktop-nav {
+        display: none; /* Hide desktop nav on mobile */
+    }
+    .mobile-nav {
+        display: flex; /* Show mobile nav */
+    }
+}
+
+.home-button {
+    display: inline-block;
+    text-decoration: none;
+    color: #333;
+}
+
+/* Style for the product list */
+.product-list {
+    display: flex; /* Use flexbox for horizontal layout */
+    flex-wrap: wrap; /* Allow items to wrap to the next line */
+    margin: 20px auto; /* Center the list horizontally with auto margins */
+    padding: 10px;
+    justify-content: center; /* Center items horizontally */
+    max-width: 1200px; /* Optional: Set a maximum width for the product list */
+}
+/* Style for the product list */
+.new-product-list {
+    display: flex; /* Use flexbox for horizontal layout */
+    flex-wrap: wrap; /* Allow items to wrap to the next line */
+    margin: 20px auto; /* Center the list horizontally with auto margins */
+    padding: 10px;
+    justify-content: center; /* Center items horizontally */
+    max-width: 1200px; /* Optional: Set a maximum width for the product list */
+}
+
+/* Show products in a column on small screens */
+@media (max-width: 768px) {
+    .product-list {
+        flex-direction: column; /* Stack items vertically */
+    }
+}
+@media (max-width: 768px) {
+    .new-product-list {
+        flex-direction: column; /* Stack items vertically */
+    }
+}
+
+/* Style for each product item */
+.product-item {
+    margin: 10px; /* Add space between items */
+    padding: 10px; /* Add padding */
+    flex: 1 1 calc(33.33% - 20px); /* Allow items to grow and set a base width for 3 items per row */
+    max-width: 300px; /* Set a maximum width for uniformity */
+    display: flex; /* Use flexbox for layout */
+    flex-direction: column; /* Stack children vertically */
+    justify-content: space-between; /* Space out children */
+    border-radius: 20px; /* Keep rounded corners if desired */
+    background-color: white; /* Set product item background to white */
+    overflow: hidden; /* Hide overflow content */
+}
+
+/* Optional: Style for the product description to handle overflow */
+.product-item p {
+    overflow: hidden; /* Hide overflow text */
+    text-overflow: ellipsis; /* Add ellipsis for overflow text */
+    white-space: nowrap; /* Prevent text from wrapping */
+}
+
+/* Style for the add to cart icon */
+.add-to-cart {
+    display: inline-flex; /* Align icon and text */
+    align-items: center; /* Center vertically */
+    margin-top: auto; /* Push to the bottom */
+    position: relative; /* Position relative for absolute positioning of plus */
+}
+
+/* Style for the cart icon */
+.cart-icon {
+    position: relative;
+    bottom: 0; /* Position relative for the plus icon */
+}
+
+/* Example usage of the color palette */
+body {
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+h1, h2, h3 {
+    color: var(--primary-color);
+}
+
+a {
+    color: var(--secondary-color);
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--accent-color);
+}
+
+/* Navigation styles */
+.desktop-nav nav ul {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    gap: 20px;
+}
+
+.desktop-nav nav li {
+    list-style: none;
+}
+
+.desktop-nav nav li div {
+    display: flex;
+    align-items: center;
+}
+
+.desktop-nav nav li div a {
+    display: block;
+    padding: 8px 16px;
+    color: var(--text-color);
+    position: relative;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    overflow: hidden;  /* Add this to contain the pseudo-element */
+}
+
+/* Background slide effect */
+.desktop-nav nav li div a::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;  /* Start from outside the left */
+    width: 100%;
+    height: 100%;
+    background-color: var(--primary-color);
+    opacity: 0.1;
+    transition: left 0.3s ease;
+    z-index: -1;
+}
+
+/* Slide in the background on hover */
+.desktop-nav nav li div a:hover::before {
+    left: 0;
+}
+
+/* Text color change on hover */
+.desktop-nav nav li div a:hover {
+    color: var(--primary-color);
+}
+
+/* Adjust the secondRow to properly align navigation */
+.desktop-nav .secondRow {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-top: 10px;
+}
+
+/* Rest of your navigation hover effects remain the same */
+
+/* Mobile navigation adjustments */
+.mobile-menu div {
+    margin: 10px 0;
+    width: 100%;
+}
+
+.mobile-menu div a {
+    display: block;
+    padding: 8px 16px;
+    transition: all 0.3s ease;
+    overflow: hidden;  /* Add this to contain the pseudo-element */
+}
+
+/* Background slide effect */
+.mobile-menu div a::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background-color: var(--primary-color);
+    opacity: 0.1;
+    transition: left 0.3s ease;
+    z-index: -1;
+}
+
+/* Slide in the background on hover */
+.mobile-menu div a:hover::before {
+    left: 0;
+}
+
+/* Text color change on hover */
+.mobile-menu div a:hover {
+    color: var(--primary-color);
+}
+
+/* First row styling */
+.desktop-nav .firstRow {
+    display: flex;
+    justify-content: space-between; /* Space between logo and icons */
+    align-items: center;
+    left: 0;
+    right: 0;
+    padding: 10px 20px;
+    gap: 20px;
+}
+
+/* Icon container styling */
+.icon-container {
+    display: flex; /* Use flexbox for layout */
+    align-items: center; /* Center icons vertically */
+    gap: 15px; /* Space between icons */
+    padding: 10px;
+}
+
+/* Style for the search icon */
+.search-icon {
+    cursor: pointer; /* Change cursor to pointer */
+}
+
+/* Style for the cart icon */
+.cart-icon {
+    cursor: pointer; /* Change cursor to pointer */
+}
+
+/* Style for the favorite icon */
+.fav-icon {
+    cursor: pointer; /* Change cursor to pointer */
+}
+
+/* Optional: Add hover effects for icons */
+.icon-container a:hover {
+    color: var(--primary-color); /* Change color on hover */
+}
+
+/* Search input styling */
+.desktop-nav .firstRow input[type="search"] {
+    /*flex: 1;  /* Takes up remaining space */
+    min-width: 200px;
+    padding: 8px 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.desktop-nav .firstRow input[type="search"]:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 5px rgba(1, 161, 106, 0.2);
+}
+
+/* Logo/heading styling */
+.desktop-nav .firstRow h1 {
+    margin: 0;
+    white-space: nowrap;
+    font-size: 24px;
+}
+
+/* Button styling */
+.desktop-nav .firstRow button {
+    padding: 8px;
+    min-width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background-color: var(--background-color);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.desktop-nav .firstRow button:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .desktop-nav .firstRow {
+        padding: 10px;
+        gap: 10px;
+    }
+    
+    .desktop-nav .firstRow input[type="search"] {
+        min-width: 150px;
+    }
+}
+
+/* Dropdown styles */
+.dropdown {
+    position: relative;
+}
+
+.dropdown-trigger {
+    cursor: pointer;
+}
+
+.dropdown-content {
+    display: flex;
+    position: absolute;
+    flex-direction: column; 
+    top: 100%;
+    left: 0;
+    background-color: var(--accent-color);
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    min-width: 170px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    z-index: 900;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.3s, transform 0.3s;
+    text-align: left;  /* Ensure text alignment is left */
+}
+
+.dropdown:hover .dropdown-content {
+    display: flex;
+    z-index: 1001;
+    flex-direction: column;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.dropdown-content a {
+    padding: 12px 16px;
+    color: var(--text-color);
+    white-space: nowrap;
+    transition: all 0.3s ease;
+    width: 100%;  /* Make links take full width */
+    text-align: left;  /* Ensure text alignment is left */
+    box-sizing: border-box;  /* Include padding in width calculation */
+}
+
+.dropdown-content a:hover {
+    background-color: var(--background-color);
+    color: var(--primary-color);
+    padding-left: 24px;
+    text-align: left;
+    border-radius: 10px;
+}
+
+/* Add arrow rotation animation */
+.dropdown-trigger a {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.dropdown:hover .dropdown-trigger a {
+    color: var(--primary-color);
+}
+
+/* Ensure dropdown doesn't disappear when moving to submenu */
+.dropdown-content::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 0;
+    width: 10px;
+    height: 10px;
+}
+
+/* Home page specific styles */
+.home-welcome {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    text-align: center;
+    background-image: url('https://images.unsplash.com/photo-1563014959-7aaa83350992?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+    padding: 40px 20px;
+    margin-top: -20px; /* Offset the main padding */
+}
+
+/* Add overlay to ensure text readability */
+.home-welcome::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5); /* Dark overlay for better text visibility */
+    z-index: 1;
+}
+
+.home-welcome h1 {
+    color: white;
+    position: relative;
+    z-index: 2;
+    font-size: 3rem;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Top products section styling */
+.top_products {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.top_products h1 {
+    margin-bottom: 30px;
+}
+
+/* Style for the product image */
+.product-image {
+    width: 100%; /* Make the image responsive */
+    height: 200px; /* Set a uniform height for all images */
+    object-fit: contain; /* Maintain aspect ratio and fit the image within the area */
+    border-radius: 10px; /* Optional: Add rounded corners */
+    margin-bottom: 10px; /* Space between image and title */
+}
