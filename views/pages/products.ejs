@@ -4,9 +4,9 @@
             <div class="view-options">
                 <button class="filter-toggle" id="filterToggle">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M4 4H20M4 12H20M4 20H20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M4 4H20M4 12H20M4 20H20" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" />
                     </svg>
-                    Filters
                 </button>
                 <div class="sort-options">
                     <select class="sort-select">
@@ -144,122 +144,134 @@
                 </div>
             </div>
             <div class="products-grid" data-view="grid">
-            <!-- Display product list -->
-            <% if (products && products.length > 0) { %>
-                <% products.forEach(product => { %>
-                        <div class="product-card" 
-                            data-category="<%= product.category %>"
-                            data-brand="<%= product.brand %>"
-                            data-price="<%= product.price %>"
-                            data-date="<%= product.createdAt %>"
-                            data-color="<%= product.color %>"
-                            data-quantity="<%= product.quantity %>"
-                            data-sold="<%= product.sold %>">
+                <!-- Display product list -->
+                <% if (products && products.length> 0) { %>
+                    <% products.forEach(product=> { %>
+                        <div class="product-card" data-category="<%= product.category %>"
+                            data-brand="<%= product.brand %>" data-price="<%= product.price %>"
+                            data-date="<%= product.createdAt %>" data-color="<%= product.color %>"
+                            data-quantity="<%= product.quantity %>" data-sold="<%= product.sold %>">
                             <a href="/product/<%= product._id %>" class="product-link">
-                        <div class="product-item">
-                            <div class="product-image-container">
-                                <% if (product.images && product.images.length > 0) { %>
-                                    <img src="<%= product.images[0] %>" alt="<%= product.title %>"
-                                        class="product-image" />
-                                <% } %>
-                                <div class="product-tag">New</div>
-                                        <% if (product.quantity <= 10 && product.quantity > 0) { %>
+                                <div class="product-item">
+                                    <div class="product-image-container">
+                                        <% if (product.images && product.images.length> 0) { %>
+                                            <img src="<%= product.images[0] %>" alt="<%= product.title %>"
+                                                class="product-image" />
+                                        <% } %>
+                                        <div class="product-tag">New</div>
+                                        <% if (product.quantity <=10 && product.quantity> 0) { %>
                                             <div class="product-tag low-stock">Low Stock</div>
                                         <% } %>
-                                        <% if (product.quantity === 0) { %>
+                                        <% if (product.quantity===0) { %>
                                             <div class="product-tag out-of-stock">Out of Stock</div>
                                         <% } %>
-                            </div>
-                            <div class="product-info">
+                                    </div>
+                                    <div class="product-info">
                                         <div class="product-header">
-                                <h3 class="product-title">
-                                    <%= product.title %>
-                                </h3>
+                                            <h3 class="product-title">
+                                                <%= product.title %>
+                                            </h3>
                                             <div class="product-meta">
-                                                <span class="product-brand"><%= product.brand %></span>
-                                                <span class="product-category"><%= product.category %></span>
+                                                <span class="product-brand">
+                                                    <%= product.brand %>
+                                                </span>
+                                                <span class="product-category">
+                                                    <%= product.category %>
+                                                </span>
                                             </div>
                                         </div>
-                                <div class="product-price">
+                                        <div class="product-price">
                                             <p>$<%= product.price.toFixed(2) %></p>
-                                            <% if (product.ratings && product.ratings.length > 0) { %>
+                                            <% if (product.ratings && product.ratings.length> 0) { %>
                                                 <div class="product-rating">
-                                                    <% const avgRating = product.ratings.reduce((acc, curr) => acc + curr.rating, 0) / product.ratings.length; %>
+                                                    <% const avgRating=product.ratings.reduce((acc, curr)=> acc +
+                                                        curr.rating, 0) / product.ratings.length; %>
                                                     <span class="rating-stars">
-                                                        <% for(let i = 1; i <= 5; i++) { %>
-                                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="<%= i <= avgRating ? '#FFD700' : 'none' %>" stroke="<%= i <= avgRating ? '#FFD700' : 'currentColor' %>">
-                                                                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        <% for(let i=1; i <=5; i++) { %>
+                                                            <svg width="16" height="16" viewBox="0 0 24 24"
+                                                                fill="<%= i <= avgRating ? '#FFD700' : 'none' %>"
+                                                                stroke="<%= i <= avgRating ? '#FFD700' : 'currentColor' %>">
+                                                                <path
+                                                                    d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
+                                                                    stroke-width="2" stroke-linecap="round"
+                                                                    stroke-linejoin="round" />
                                                             </svg>
                                                         <% } %>
                                                     </span>
                                                     <span class="rating-count">(<%= product.ratings.length %>)</span>
                                                 </div>
                                             <% } %>
-                                </div>
-                                <p class="product-description">
-                                    <%= product.description %>
-                                </p>
+                                        </div>
+                                        <p class="product-description">
+                                            <%= product.description %>
+                                        </p>
                                         <div class="product-details">
                                             <div class="product-color">
                                                 <span class="detail-label">Color:</span>
-                                                <span class="detail-value"><%= product.color %></span>
+                                                <span class="detail-value">
+                                                    <%= product.color %>
+                                                </span>
                                             </div>
                                             <div class="product-stock">
                                                 <span class="detail-label">Stock:</span>
-                                                <span class="detail-value"><%= product.quantity %> Available</span>
+                                                <span class="detail-value">
+                                                    <%= product.quantity %> Available
+                                                </span>
                                             </div>
-                                            <% if (product.sold > 0) { %>
+                                            <% if (product.sold> 0) { %>
                                                 <div class="product-sold">
                                                     <span class="detail-label">Sold:</span>
-                                                    <span class="detail-value"><%= product.sold %> units</span>
+                                                    <span class="detail-value">
+                                                        <%= product.sold %> units
+                                                    </span>
                                                 </div>
                                             <% } %>
                                         </div>
                                     </div>
                                 </div>
                             </a>
-                                <div class="product-actions">
-                                    <button class="wishlist-button">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path
-                                                d="M20.84 4.61C20.3292 4.099 19.7228 3.69364 19.0554 3.41708C18.388 3.14052 17.6726 2.99817 16.95 2.99817C16.2274 2.99817 15.512 3.14052 14.8446 3.41708C14.1772 3.69364 13.5708 4.099 13.06 4.61L12 5.67L10.94 4.61C9.9083 3.57831 8.50903 2.9989 7.05 2.9989C5.59096 2.9989 4.19169 3.57831 3.16 4.61C2.1283 5.64169 1.54889 7.04096 1.54889 8.5C1.54889 9.95904 2.1283 11.3583 3.16 12.39L4.22 13.45L12 21.23L19.78 13.45L20.84 12.39C21.351 11.8792 21.7563 11.2728 22.0329 10.6054C22.3095 9.93801 22.4518 9.2226 22.4518 8.5C22.4518 7.7774 22.3095 7.06199 22.0329 6.39458C21.7563 5.72718 21.351 5.12076 20.84 4.61V4.61Z"
-                                                stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-                                                stroke-linejoin="round" />
-                                        </svg>
-                                    </button>
-                                <button class="add-to-cart" <%= product.quantity === 0 ? 'disabled' : '' %>>
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path
-                                                d="M9 22C9.55228 22 10 21.5523 10 21C10 20.4477 9.55228 20 9 20C8.44772 20 8 20.4477 8 21C8 21.5523 8.44772 22 9 22Z"
-                                                stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-                                                stroke-linejoin="round" />
-                                            <path
-                                                d="M20 22C20.5523 22 21 21.5523 21 21C21 20.4477 20.5523 20 20 20C19.4477 20 19 20.4477 19 21C19 21.5523 19.4477 22 20 22Z"
-                                                stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-                                                stroke-linejoin="round" />
-                                            <path
-                                                d="M1 1H5L7.68 14.39C7.77144 14.8504 8.02191 15.264 8.38755 15.5583C8.75318 15.8526 9.2107 16.009 9.68 16H19.4C19.8693 16.009 20.3268 15.8526 20.6925 15.5583C21.0581 15.264 21.3086 14.8504 21.4 14.39L23 6H6"
-                                                stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-                                                stroke-linejoin="round" />
-                                        </svg>
-                                    <%= product.quantity === 0 ? 'Out of Stock' : 'Add to Cart' %>
-                                    </button>
+                            <div class="product-actions">
+                                <button class="wishlist-button">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <path
+                                            d="M20.84 4.61C20.3292 4.099 19.7228 3.69364 19.0554 3.41708C18.388 3.14052 17.6726 2.99817 16.95 2.99817C16.2274 2.99817 15.512 3.14052 14.8446 3.41708C14.1772 3.69364 13.5708 4.099 13.06 4.61L12 5.67L10.94 4.61C9.9083 3.57831 8.50903 2.9989 7.05 2.9989C5.59096 2.9989 4.19169 3.57831 3.16 4.61C2.1283 5.64169 1.54889 7.04096 1.54889 8.5C1.54889 9.95904 2.1283 11.3583 3.16 12.39L4.22 13.45L12 21.23L19.78 13.45L20.84 12.39C21.351 11.8792 21.7563 11.2728 22.0329 10.6054C22.3095 9.93801 22.4518 9.2226 22.4518 8.5C22.4518 7.7774 22.3095 7.06199 22.0329 6.39458C21.7563 5.72718 21.351 5.12076 20.84 4.61V4.61Z"
+                                            stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                                            stroke-linejoin="round" />
+                                    </svg>
+                                </button>
+                                <button class="add-to-cart" <%=product.quantity===0 ? 'disabled' : '' %>>
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <path
+                                            d="M9 22C9.55228 22 10 21.5523 10 21C10 20.4477 9.55228 20 9 20C8.44772 20 8 20.4477 8 21C8 21.5523 8.44772 22 9 22Z"
+                                            stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                                            stroke-linejoin="round" />
+                                        <path
+                                            d="M20 22C20.5523 22 21 21.5523 21 21C21 20.4477 20.5523 20 20 20C19.4477 20 19 20.4477 19 21C19 21.5523 19.4477 22 20 22Z"
+                                            stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                                            stroke-linejoin="round" />
+                                        <path
+                                            d="M1 1H5L7.68 14.39C7.77144 14.8504 8.02191 15.264 8.38755 15.5583C8.75318 15.8526 9.2107 16.009 9.68 16H19.4C19.8693 16.009 20.3268 15.8526 20.6925 15.5583C21.0581 15.264 21.3086 14.8504 21.4 14.39L23 6H6"
+                                            stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                                            stroke-linejoin="round" />
+                                    </svg>
+                                    <%= product.quantity===0 ? 'Out of Stock' : 'Add to Cart' %>
+                                </button>
                             </div>
                         </div>
-                    </div>
-                <% }); %>
-            <% } else { %>
-                <p>No products available.</p>
-            <% } %>
+                    <% }); %>
+                <% } else { %>
+                    <p>No products available.</p>
+                <% } %>
             </div>
         </div>
         <!-- Pagination -->
         <div class="pagination">
             <button class="pagination-button prev" id="prevPage" disabled>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" />
                 </svg>
                 Previous
             </button>
@@ -269,7 +281,8 @@
             <button class="pagination-button next" id="nextPage">
                 Next
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" />
                 </svg>
             </button>
         </div>
@@ -278,4 +291,5 @@
 
 <script src="/js/main.js"></script>
 </body>
+
 </html>
