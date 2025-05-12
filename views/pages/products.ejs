@@ -1,11 +1,161 @@
 <section class="featured-products">
     <div class="container">
-        <h2 class="section-title">Featured Products</h2>
-        <div class="products-grid">
+        <div class="products-header">
+            <div class="view-options">
+                <button class="filter-toggle" id="filterToggle">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4 4H20M4 12H20M4 20H20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    Filters
+                </button>
+                <div class="sort-options">
+                    <select class="sort-select">
+                        <option value="">Sort by</option>
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                        <option value="price-low">Price: Low to High</option>
+                        <option value="price-high">Price: High to Low</option>
+                        <option value="name-asc">Name: A to Z</option>
+                        <option value="name-desc">Name: Z to A</option>
+                    </select>
+                </div>
+                <button class="view-button active" data-view="grid">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="3" y="3" width="7" height="7" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                        <rect x="14" y="3" width="7" height="7" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                        <rect x="3" y="14" width="7" height="7" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                        <rect x="14" y="14" width="7" height="7" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </button>
+                <button class="view-button" data-view="list">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="3" y="3" width="18" height="4" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                        <rect x="3" y="10" width="18" height="4" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                        <rect x="3" y="17" width="18" height="4" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <div class="products-layout">
+            <div class="filters-column">
+                <div class="filter-section">
+                    <h3>Categories</h3>
+                    <div class="filter-options">
+                        <label class="filter-option">
+                            <input type="checkbox" name="category" value="Smartphone"> Smartphones
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" name="category" value="Tablet"> Tablets
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" name="category" value="Laptop"> Laptops
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" name="category" value="Accessories"> Accessories
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" name="category" value="Smartwatch"> Smartwatches
+                        </label>
+                    </div>
+                </div>
+                <div class="filter-section">
+                    <h3>Price Range</h3>
+                    <div class="filter-options">
+                        <label class="filter-option">
+                            <input type="checkbox" name="price" value="0-500"> Under $500
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" name="price" value="500-1000"> $500 - $1000
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" name="price" value="1000-2000"> $1000 - $2000
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" name="price" value="2000+"> $2000+
+                        </label>
+                    </div>
+                </div>
+                <div class="filter-section">
+                    <h3>Brand</h3>
+                    <div class="filter-options">
+                        <label class="filter-option">
+                            <input type="checkbox" name="brand" value="Apple"> Apple
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" name="brand" value="Samsung"> Samsung
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" name="brand" value="Google"> Google
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" name="brand" value="Microsoft"> Microsoft
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" name="brand" value="Dell"> Dell
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" name="brand" value="HP"> HP
+                        </label>
+                    </div>
+                </div>
+                <div class="filter-section">
+                    <h3>Availability</h3>
+                    <div class="filter-options">
+                        <label class="filter-option">
+                            <input type="checkbox" name="availability" value="in-stock"> In Stock
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" name="availability" value="low-stock"> Low Stock
+                        </label>
+                    </div>
+                </div>
+                <div class="filter-section">
+                    <h3>Color</h3>
+                    <div class="filter-options">
+                        <label class="filter-option">
+                            <input type="checkbox" name="color" value="Space Black"> Space Black
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" name="color" value="Silver"> Silver
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" name="color" value="Gold"> Gold
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" name="color" value="Blue"> Blue
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" name="color" value="Red"> Red
+                        </label>
+                    </div>
+                </div>
+                <div class="filter-actions">
+                    <div class="filter-buttons">
+                        <button class="filter-reset-button">Reset</button>
+                        <button class="filter-ok-button">OK</button>
+                    </div>
+                </div>
+            </div>
+            <div class="products-grid" data-view="grid">
             <!-- Display product list -->
             <% if (products && products.length > 0) { %>
                 <% products.forEach(product => { %>
-                    <div class="product-card">
+                        <div class="product-card" 
+                            data-category="<%= product.category %>"
+                            data-brand="<%= product.brand %>"
+                            data-price="<%= product.price %>"
+                            data-date="<%= product.createdAt %>"
+                            data-color="<%= product.color %>"
+                            data-quantity="<%= product.quantity %>"
+                            data-sold="<%= product.sold %>">
+                            <a href="/product/<%= product._id %>" class="product-link">
                         <div class="product-item">
                             <div class="product-image-container">
                                 <% if (product.images && product.images.length > 0) { %>
@@ -13,17 +163,61 @@
                                         class="product-image" />
                                 <% } %>
                                 <div class="product-tag">New</div>
+                                        <% if (product.quantity <= 10 && product.quantity > 0) { %>
+                                            <div class="product-tag low-stock">Low Stock</div>
+                                        <% } %>
+                                        <% if (product.quantity === 0) { %>
+                                            <div class="product-tag out-of-stock">Out of Stock</div>
+                                        <% } %>
                             </div>
                             <div class="product-info">
+                                        <div class="product-header">
                                 <h3 class="product-title">
                                     <%= product.title %>
                                 </h3>
+                                            <div class="product-meta">
+                                                <span class="product-brand"><%= product.brand %></span>
+                                                <span class="product-category"><%= product.category %></span>
+                                            </div>
+                                        </div>
                                 <div class="product-price">
-                                    <p>Price: $<%= product.price %></p>
+                                            <p>$<%= product.price.toFixed(2) %></p>
+                                            <% if (product.ratings && product.ratings.length > 0) { %>
+                                                <div class="product-rating">
+                                                    <% const avgRating = product.ratings.reduce((acc, curr) => acc + curr.rating, 0) / product.ratings.length; %>
+                                                    <span class="rating-stars">
+                                                        <% for(let i = 1; i <= 5; i++) { %>
+                                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="<%= i <= avgRating ? '#FFD700' : 'none' %>" stroke="<%= i <= avgRating ? '#FFD700' : 'currentColor' %>">
+                                                                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                            </svg>
+                                                        <% } %>
+                                                    </span>
+                                                    <span class="rating-count">(<%= product.ratings.length %>)</span>
+                                                </div>
+                                            <% } %>
                                 </div>
                                 <p class="product-description">
                                     <%= product.description %>
                                 </p>
+                                        <div class="product-details">
+                                            <div class="product-color">
+                                                <span class="detail-label">Color:</span>
+                                                <span class="detail-value"><%= product.color %></span>
+                                            </div>
+                                            <div class="product-stock">
+                                                <span class="detail-label">Stock:</span>
+                                                <span class="detail-value"><%= product.quantity %> Available</span>
+                                            </div>
+                                            <% if (product.sold > 0) { %>
+                                                <div class="product-sold">
+                                                    <span class="detail-label">Sold:</span>
+                                                    <span class="detail-value"><%= product.sold %> units</span>
+                                                </div>
+                                            <% } %>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
                                 <div class="product-actions">
                                     <button class="wishlist-button">
                                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
@@ -34,7 +228,7 @@
                                                 stroke-linejoin="round" />
                                         </svg>
                                     </button>
-                                    <button class="add-to-cart">
+                                <button class="add-to-cart" <%= product.quantity === 0 ? 'disabled' : '' %>>
                                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
                                             xmlns="http://www.w3.org/2000/svg">
                                             <path
@@ -50,9 +244,8 @@
                                                 stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
                                                 stroke-linejoin="round" />
                                         </svg>
-                                        Add to Cart
+                                    <%= product.quantity === 0 ? 'Out of Stock' : 'Add to Cart' %>
                                     </button>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -60,6 +253,29 @@
             <% } else { %>
                 <p>No products available.</p>
             <% } %>
+            </div>
+        </div>
+        <!-- Pagination -->
+        <div class="pagination">
+            <button class="pagination-button prev" id="prevPage" disabled>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Previous
+            </button>
+            <div class="pagination-numbers" id="paginationNumbers">
+                <!-- Page numbers will be inserted here by JavaScript -->
+            </div>
+            <button class="pagination-button next" id="nextPage">
+                Next
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
         </div>
     </div>
 </section>
+
+<script src="/js/main.js"></script>
+</body>
+</html>
