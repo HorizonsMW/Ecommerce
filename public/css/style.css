@@ -1358,3 +1358,25 @@ footer {
     margin-bottom: 1rem;
   }
 }
+
+.input-field {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.25rem;
+    background-color: var(--card-bg);
+    color: var(--text-primary);
+    font-size: 1rem;
+    margin-bottom: 1rem;
+}
+
+.input-field:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+}
+.login-section{
+  background-color: var(--card-bg);
+  margin: 2rem;
+  align-items: center;
+  border-radius: 2rem;
+}

@@ -13,7 +13,40 @@ document.addEventListener("DOMContentLoaded", function () {
   const filterOkButton = document.querySelector(".filter-ok-button");
   const filterResetButton = document.querySelector(".filter-reset-button");
   const allProducts = Array.from(document.querySelectorAll(".product-card"));
+  const accountButton = document.getElementById("account-icon");
+  const cartButton = document.getElementById("cart-icon");
 
+  // Profile actions
+  if (accountButton) {
+    accountButton.addEventListener("click", async () => {
+      try {
+        const response = await fetch("/user/profile", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`, // Assuming you store the JWT in localStorage
+          },
+        });
+
+        if (response.ok) {
+          const userData = await response.json();
+          console.log("User is logged in:", userData);
+          window.location.href = "/user/profile";
+        } else {
+          console.log("User is not logged in or session expired.");
+          window.location.href = "/user/login";
+        }
+      } catch (error) {
+        console.error("Error checking user status:", error);
+      }
+    });
+  }
+
+  // Cart actions
+  if (cartButton) {
+    cartButton.addEventListener("click", () => {
+      console.log("Cart clicked");
+    });
+  }
   // Reset filters
   if (filterResetButton) {
     filterResetButton.addEventListener("click", function () {
