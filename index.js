@@ -11,6 +11,7 @@ const cookieParser = require("cookie-parser");
 const morgan = require('morgan');
 const PORT = process.env.PORT || 4000;
 const expressLayouts = require('express-ejs-layouts'); // Import express-ejs-layouts
+app.use(cookieParser());
 
 
 

@@ -1,0 +1,149 @@
+<%- include('../layouts/header') %>
+
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4">
+      <div class="card shadow">
+        <div class="card-header bg-primary text-white text-center">
+          <h4><i class="fas fa-sign-in-alt"></i> Login</h4>
+        </div>
+        <div class="card-body">
+          
+          <!-- Flash Messages -->
+          <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+              <i class="fas fa-exclamation-circle"></i> <%= errorMessage %>
+              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+          <% } %>
+          
+          <% if (typeof successMessage !== 'undefined' && successMessage) { %>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+              <i class="fas fa-check-circle"></i> <%= successMessage %>
+              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+          <% } %>
+
+          <!-- Login Form -->
+          <form action="/api/user/login" method="POST" id="loginForm">
+            <div class="mb-3">
+              <label for="email" class="form-label">
+                <i class="fas fa-envelope"></i> Email Address
+              </label>
+              <input 
+                type="email" 
+                class="form-control" 
+                id="email" 
+                name="email" 
+                placeholder="Enter your email" 
+                required
+                value="<%= typeof email !== 'undefined' ? email : '' %>"
+              >
+            </div>
+
+            <div class="mb-3">
+              <label for="password" class="form-label">
+                <i class="fas fa-lock"></i> Password
+              </label>
+              <div class="input-group">
+                <input 
+                  type="password" 
+                  class="form-control" 
+                  id="password" 
+                  name="password" 
+                  placeholder="Enter your password" 
+                  required
+                >
+                <button 
+                  class="btn btn-outline-secondary" 
+                  type="button" 
+                  id="togglePassword"
+                >
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="mb-3 form-check">
+              <input type="checkbox" class="form-check-input" id="remember">
+              <label class="form-check-label" for="remember">Remember me</label>
+            </div>
+
+            <div class="d-grid">
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-sign-in-alt"></i> Login
+              </button>
+            </div>
+          </form>
+
+          <hr>
+
+          <div class="text-center">
+            <p class="mb-0">
+              Don't have an account? 
+              <a href="/users/register">Register here</a>
+            </p>
+            <p class="mb-0 mt-2">
+              <a href="/forgot-password">Forgot Password?</a>
+            </p>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Test Credentials (Dev Only) -->
+      <% if (process.env.NODE_ENV === 'development') { %>
+      <div class="card mt-3 border-warning">
+        <div class="card-header bg-warning text-dark">
+          <small><i class="fas fa-flask"></i> Test Credentials (Dev Only)</small>
+        </div>
+        <div class="card-body">
+          <small>
+            <strong>Admin:</strong> admin@example.com / Test@1234<br>
+            <strong>User 1:</strong> testuser1@example.com / Test@1234<br>
+            <strong>User 2:</strong> testuser2@example.com / Test@1234
+          </small>
+        </div>
+      </div>
+      <% } %>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  // Toggle Password Visibility
+  document.getElementById('togglePassword').addEventListener('click', function() {
+    const passwordField = document.getElementById('password');
+    const icon = this.querySelector('i');
+    
+    if (passwordField.type === 'password') {
+      passwordField.type = 'text';
+      icon.classList.remove('fa-eye');
+      icon.classList.add('fa-eye-slash');
+    } else {
+      passwordField.type = 'password';
+      icon.classList.remove('fa-eye-slash');
+      icon.classList.add('fa-eye');
+    }
+  });
+
+  // Form Validation
+  document.getElementById('loginForm').addEventListener('submit', function(e) {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    if (!email || !password) {
+      e.preventDefault();
+      alert('Please fill in all fields');
+      return;
+    }
+
+    // Show loading state
+    const submitBtn = this.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+  });
+</script>
+
+<%- include('../layouts/footer') %>

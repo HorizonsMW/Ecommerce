@@ -1,0 +1,571 @@
+<% if (typeof user === 'undefined' || !user) { %>
+    <script>
+        // 🔐 Redirect if no user data (server-side guard)
+        window.location.href = '/user/login';
+    </script>
+<% } %>
+
+<section class="profile-section">
+    <div class="container">
+        <!-- Header with Welcome & Logout -->
+        <div class="profile-header">
+            <!-- Add near the top of profile.ejs, inside .profile-header -->
+             <button id="homeBtn" class="cta-button cta-secondary">
+<a href="/" class="link-primary" style="display: inline-flex; align-items: center; gap: 0.25rem; text-decoration: none;">
+  ← Back to Home
+</a>
+</button>
+            <div>
+                <h2 class="section-title">My Profile</h2>
+                <p class="section-subtitle">Manage your account settings and preferences</p>
+            </div>
+            <button id="logoutBtn" class="cta-button cta-secondary">
+                <span>🚪</span> Logout
+            </button>
+        </div>
+
+        <!-- Error/Success Messages -->
+        <div id="messageBox" class="message-box" style="display: none;"></div>
+
+        <!-- Profile Content Grid -->
+        <div class="profile-grid">
+            
+            <!-- Left Column: Profile Card -->
+            <div class="profile-card">
+                <div class="profile-avatar">
+                    <span class="avatar-initials" id="avatarInitials">
+                        <%= user.firstname?.[0] || 'U' %><%= user.lastname?.[0] || 'S' %>
+                    </span>
+                    <% if (user.isAdmin) { %>
+                        <span class="admin-badge" title="Administrator">👑 Admin</span>
+                    <% } %>
+                </div>
+                
+                <div class="profile-info">
+                    <h3 class="profile-name" id="displayName">
+                        <%= user.firstname %> <%= user.lastname %>
+                    </h3>
+                    <p class="profile-email" id="displayEmail"><%= user.email %></p>
+                    <p class="profile-mobile" id="displayMobile">
+                        📱 <%= user.mobile || 'Not provided' %>
+                    </p>
+                    
+                    <div class="profile-meta">
+                        <span class="meta-item">
+                            <strong>Member since:</strong> 
+                            <span id="memberSince"><%= new Date(user.createdAt || Date.now()).toLocaleDateString() %></span>
+                        </span>
+                        <span class="meta-item">
+                            <strong>Account status:</strong> 
+                            <span class="status-badge status-<%= user.isBlocked ? 'blocked' : 'active' %>">
+                                <%= user.isBlocked ? 'Blocked' : 'Active' %>
+                            </span>
+                        </span>
+                    </div>
+                </div>
+                
+                <button id="editProfileBtn" class="cta-button" style="width: 100%; margin-top: 1rem;">
+                    ✏️ Edit Profile
+                </button>
+            </div>
+
+            <!-- Right Column: Edit Form (Hidden by Default) -->
+            <div id="editFormCard" class="profile-card edit-form-card" style="display: none;">
+                <h4 class="form-title">Update Your Information</h4>
+                
+                <form id="editProfileForm" class="login-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="editFirstname" class="form-label">First Name</label>
+                            <input type="text" id="editFirstname" class="input-field" 
+                                   value="<%= user.firstname %>" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editLastname" class="form-label">Last Name</label>
+                            <input type="text" id="editLastname" class="input-field" 
+                                   value="<%= user.lastname %>" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editEmail" class="form-label">Email Address</label>
+                        <input type="email" id="editEmail" class="input-field" 
+                               value="<%= user.email %>" required>
+                        <small class="form-hint">Email changes may require verification</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editMobile" class="form-label">Mobile Number</label>
+                        <input type="tel" id="editMobile" class="input-field" 
+                               value="<%= user.mobile || '' %>" placeholder="+1234567890">
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" id="cancelEditBtn" class="cta-button cta-secondary">
+                            Cancel
+                        </button>
+                        <button type="submit" class="cta-button" id="saveBtn">
+                            <span class="btn-text">Save Changes</span>
+                            <span class="btn-loader" style="display: none;">Saving...</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Security Section (Full Width) -->
+            <div class="profile-card security-section">
+                <h4 class="form-title">🔐 Security Settings</h4>
+                
+                <div class="security-item">
+                    <div>
+                        <strong>Password</strong>
+                        <p class="text-secondary">Last changed: <span id="passwordLastChanged">Never</span></p>
+                    </div>
+                    <button class="cta-button cta-secondary" id="changePasswordBtn">
+                        Change Password
+                    </button>
+                </div>
+                
+                <div class="security-item">
+                    <div>
+                        <strong>Active Sessions</strong>
+                        <p class="text-secondary">Manage devices logged into your account</p>
+                    </div>
+                    <button class="cta-button cta-secondary">
+                        View Sessions
+                    </button>
+                </div>
+                
+                <% if (user.isAdmin) { %>
+                <div class="security-item admin-only">
+                    <div>
+                        <strong>⚙️ Admin Access</strong>
+                        <p class="text-secondary">You have administrator privileges</p>
+                    </div>
+                    <a href="/admin/dashboard" class="cta-button">
+                        Go to Dashboard →
+                    </a>
+                </div>
+                <% } %>
+            </div>
+
+        </div>
+    </div>
+    <!-- Password Verification Modal -->
+<div id="passwordModal" class="modal-overlay" style="display: none;">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h4 class="modal-title">🔐 Confirm Your Identity</h4>
+            <button class="modal-close" id="closePasswordModal" aria-label="Close">&times;</button>
+        </div>
+        
+        <div class="modal-body">
+            <p class="modal-description">
+                For security, please enter your password to confirm these changes.
+            </p>
+        
+            <div id="passwordError" class="error-message" style="display: none;"></div>
+        
+            <div class="form-group">
+                <label for="verifyPassword" class="form-label">Current Password</label>
+                <div class="password-wrapper">
+                    <input type="password" id="verifyPassword" name="password" class="input-field" required
+                        placeholder="••••••••" autocomplete="current-password" />
+                    <button type="button" class="toggle-password" id="togglePassword"
+                        aria-label="Toggle password visibility"><span>Show</span>
+                    </button>
+                </div>
+            </div>
+        
+        </div>
+        
+        <div class="modal-footer">
+            <button type="button" class="cta-button cta-secondary" id="cancelPasswordVerify">
+                Cancel
+            </button>
+            <button type="button" class="cta-button" id="confirmPasswordVerify">
+                <span class="btn-text">Confirm & Save</span>
+                <span class="btn-loader" style="display: none;">Verifying...</span>
+            </button>
+        </div>
+    </div>
+</div>
+</section>
+
+<!-- JavaScript: Profile Logic -->
+ <script>
+// 🔐 Auth helper - gets token for API calls
+const getAuthHeaders = () => {
+    const token = localStorage.getItem('jwtToken') || sessionStorage.getItem('jwtToken');
+    return {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        ...(token && { 'Authorization': `Bearer ${token}` })
+    };
+};
+
+// 📦 API helper
+const api = {
+    request: async (url, options = {}) => {
+        const response = await fetch(url, {
+            credentials: 'include', // 🍪 Send cookies
+            headers: getAuthHeaders(),
+            ...options
+        });
+        
+        if (response.status === 401) {
+            // Token expired/invalid → redirect to login
+            localStorage.removeItem('jwtToken');
+            sessionStorage.removeItem('jwtToken');
+            localStorage.removeItem('user');
+            sessionStorage.removeItem('user');
+            window.location.href = '/user/login?redirect=' + encodeURIComponent(window.location.pathname);
+            return null;
+        }
+        
+        if (!response.ok) {
+            const err = await response.json().catch(() => ({}));
+            throw new Error(err.message || `HTTP ${response.status}`);
+        }
+        
+        return response.json();
+    },
+    get: (url) => api.request(url, { method: 'GET' }),
+    put: (url, body) => api.request(url, { method: 'PUT', body: JSON.stringify(body) })
+};
+
+// 🎯 Show message helper
+const showMessage = (text, type = 'error') => {
+    const box = document.getElementById('messageBox');
+    box.textContent = text;
+    box.className = `message-box ${type}`;
+    box.style.display = 'block';
+    
+    // Auto-hide success messages
+    if (type === 'success') {
+        setTimeout(() => {
+            box.style.display = 'none';
+        }, 4000);
+    }
+};
+
+// 🔄 DOM Elements
+    const editProfileBtn = document.getElementById('editProfileBtn');
+    const editFormCard = document.getElementById('editFormCard');
+    const cancelEditBtn = document.getElementById('cancelEditBtn');
+    const editForm = document.getElementById('editProfileForm');
+    const saveBtn = document.getElementById('saveBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const passwordModal = document.getElementById('passwordModal');
+    const closePasswordModal = document.getElementById('closePasswordModal');
+    const cancelPasswordVerify = document.getElementById('cancelPasswordVerify');
+    const confirmPasswordVerify = document.getElementById('confirmPasswordVerify');
+    const verifyPasswordInput = document.getElementById('verifyPassword');
+    const toggleVerifyPassword = document.getElementById('toggleVerifyPassword');
+    const passwordError = document.getElementById('passwordError');
+    editFormCard.style.display = 'none';
+    editProfileBtn.style.display = 'flex';
+        document.getElementById('messageBox').style.display = 'none';
+        // Store pending update data
+        let pendingUpdateData = null;
+
+// ✏️ Toggle Edit Mode
+editProfileBtn?.addEventListener('click', () => {
+    editFormCard.style.display = 'block';
+    editProfileBtn.style.display = 'none';
+    // Scroll to form on mobile
+    if (window.innerWidth < 768) {
+        editFormCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+});
+
+cancelEditBtn?.addEventListener('click', () => {
+    // Reset form to original values from EJS-rendered user
+    document.getElementById('editFirstname').value = `<%= user.firstname %>`;
+    document.getElementById('editLastname').value = `<%= user.lastname %>`;
+    document.getElementById('editEmail').value = `<%= user.email %>`;
+    document.getElementById('editMobile').value = `<%= user.mobile || '' %>`;
+    editForm.reset();
+    editFormCard.style.display = 'none';
+    editProfileBtn.style.display = 'flex';
+    document.getElementById('messageBox').style.display = 'none';
+});
+
+
+// 🔐 Show Password Verification Modal
+const showPasswordModal = (pendingData) => {
+    pendingUpdateData = pendingData;
+    passwordError.style.display = 'none';
+    verifyPasswordInput.value = '';
+    verifyPasswordInput.focus();
+    passwordModal.style.display = 'flex';
+    
+    // Prevent background scroll
+    document.body.style.overflow = 'hidden';
+};
+
+// 🔐 Hide Password Verification Modal
+const hidePasswordModal = () => {
+    passwordModal.style.display = 'none';
+    document.body.style.overflow = '';
+    pendingUpdateData = null;
+};
+
+// Modal Close Handlers
+closePasswordModal?.addEventListener('click', hidePasswordModal);
+cancelPasswordVerify?.addEventListener('click', hidePasswordModal);
+
+// Close modal when clicking outside
+passwordModal?.addEventListener('click', (e) => {
+    if (e.target === passwordModal) {
+        hidePasswordModal();
+    }
+});
+
+// Toggle password visibility in modal
+toggleVerifyPassword?.addEventListener('click', function() {
+    const isPassword = verifyPasswordInput.type === 'password';
+    verifyPasswordInput.type = isPassword ? 'text' : 'password';
+    this.textContent = isPassword ? '🙈' : '👁️';
+});
+
+// Handle Enter key in password field
+verifyPasswordInput?.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        confirmPasswordVerify.click();
+    }
+});
+
+// 💾 Save Profile Changes WITH Password Verification
+editForm?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    // Collect updated data
+    const updatedData = {
+        firstname: document.getElementById('editFirstname').value.trim(),
+        lastname: document.getElementById('editLastname').value.trim(),
+        email: document.getElementById('editEmail').value.trim(),
+        mobile: document.getElementById('editMobile').value.trim()
+    };    
+    // Show password verification modal before proceeding
+    showPasswordModal(updatedData);
+});
+
+// ✅ Confirm Password & Proceed with Update
+confirmPasswordVerify?.addEventListener('click', async () => {
+    const password = verifyPasswordInput.value;
+    const btnText = confirmPasswordVerify.querySelector('.btn-text');
+    const btnLoader = confirmPasswordVerify.querySelector('.btn-loader');
+    
+    if (!password) {
+        passwordError.textContent = 'Please enter your password';
+        passwordError.style.display = 'block';
+        return;
+    }
+   // console.log('📤 Sending password verification:', { passwordLength: password?.length }); //debugging
+    
+    // Loading state
+    confirmPasswordVerify.disabled = true;
+    btnText.style.display = 'none';
+    btnLoader.style.display = 'inline';
+    passwordError.style.display = 'none';
+    
+    try {
+        // 🔐 Step 1: Verify password via API
+        const verifyResponse = await fetch('http://localhost:5000/api/user/verify-password', {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            credentials: 'include',
+            body: JSON.stringify({ password })
+        });
+        
+        const verifyResult = await verifyResponse.json();
+        
+        if (!verifyResponse.ok) {
+            throw new Error(verifyResult.message || 'Password verification failed');
+        }
+    
+        // ✅ Password verified - proceed with profile update
+        const updatedUser = await api.put('http://localhost:5000/user/edit-user', pendingUpdateData);
+        
+        // Update UI with new values
+        document.getElementById('displayName').textContent = `${updatedUser.firstname} ${updatedUser.lastname}`;
+        document.getElementById('displayEmail').textContent = updatedUser.email;
+        document.getElementById('displayMobile').textContent = `📱 ${updatedUser.mobile || 'Not provided'}`;
+        document.getElementById('avatarInitials').textContent = `${updatedUser.firstname[0]}${updatedUser.lastname[0]}`.toUpperCase();
+        
+        // Update stored user data
+        const storedUser = {
+            _id: updatedUser._id,
+            firstname: updatedUser.firstname,
+            lastname: updatedUser.lastname,
+            email: updatedUser.email,
+            mobile: updatedUser.mobile,
+            isAdmin: updatedUser.isAdmin
+        };
+        
+        if (localStorage.getItem('jwtToken')) {
+            localStorage.setItem('user', JSON.stringify(storedUser));
+        } else {
+            sessionStorage.setItem('user', JSON.stringify(storedUser));
+        }
+        
+        // Hide modal & show success
+        hidePasswordModal();
+        showMessage('✅ Profile updated successfully!', 'success');
+        
+        // Hide edit form after successful save
+        setTimeout(() => {
+            editFormCard.style.display = 'none';
+            editProfileBtn.style.display = 'flex';
+        }, 1000);
+        
+    } catch (error) {
+        console.error('Update error:', error);
+        passwordError.textContent = error.message || 'Verification failed. Please try again.';
+        passwordError.style.display = 'block';
+        verifyPasswordInput.focus();
+    } finally {
+        // Reset button
+        confirmPasswordVerify.disabled = false;
+        btnText.style.display = 'inline';
+        btnLoader.style.display = 'none';
+    }
+});
+
+
+/*
+
+// 💾 Save Profile Changes - MATCHES YOUR updateAUser CONTROLLER
+editForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const btnText = saveBtn.querySelector('.btn-text');
+    const btnLoader = saveBtn.querySelector('.btn-loader');
+    
+    // Loading state
+    saveBtn.disabled = true;
+    btnText.style.display = 'none';
+    btnLoader.style.display = 'inline';
+    document.getElementById('messageBox').style.display = 'none';
+    
+    try {
+        const updatedData = {
+            firstname: document.getElementById('editFirstname').value.trim(),
+            lastname: document.getElementById('editLastname').value.trim(),
+            email: document.getElementById('editEmail').value.trim(),
+            mobile: document.getElementById('editMobile').value.trim()
+        };
+        
+        // ✅ Call your exact endpoint: PUT /api/user/edit-user
+        // Your updateAUser returns the user object DIRECTLY (not wrapped)
+
+        //check password before update:
+
+
+        const updatedUser = await api.put('http://localhost:5000/user/edit-user', updatedData);
+        
+        // ✅ updatedUser is the raw user object from your controller:
+        // { _id, firstname, lastname, email, mobile, isAdmin, ... }
+        
+        // Update UI with new values
+        document.getElementById('displayName').textContent = `${updatedUser.firstname} ${updatedUser.lastname}`;
+        document.getElementById('displayEmail').textContent = updatedUser.email;
+        document.getElementById('displayMobile').textContent = `📱 ${updatedUser.mobile || 'Not provided'}`;
+        document.getElementById('avatarInitials').textContent = `${updatedUser.firstname[0]}${updatedUser.lastname[0]}`.toUpperCase();
+        
+        // Update stored user data (match your backend response structure)
+        const storedUser = {
+            _id: updatedUser._id,
+            firstname: updatedUser.firstname,
+            lastname: updatedUser.lastname,
+            email: updatedUser.email,
+            mobile: updatedUser.mobile,
+            isAdmin: updatedUser.isAdmin
+        };
+        
+        if (localStorage.getItem('jwtToken')) {
+            localStorage.setItem('user', JSON.stringify(storedUser));
+        } else {
+            sessionStorage.setItem('user', JSON.stringify(storedUser));
+        }
+        
+        showMessage('✅ Profile updated successfully!', 'success');
+        
+        // Hide form after successful save
+        setTimeout(() => {
+            editFormCard.style.display = 'none';
+            editProfileBtn.style.display = 'flex';
+        }, 1000);
+        
+    } catch (error) {
+        console.error('Update error:', error);
+        showMessage(error.message || 'Failed to update profile', 'error');
+    } finally {
+        // Reset button
+        saveBtn.disabled = false;
+        btnText.style.display = 'inline';
+        btnLoader.style.display = 'none';
+    }
+});*/
+
+// 🚪 Logout Handler (matches your logout controller)
+logoutBtn?.addEventListener('click', async () => {
+    if (!confirm('Are you sure you want to logout?')) return;
+    
+    try {
+        // Call your backend logout endpoint
+        await fetch('http://localhost:5000/api/user/logout', {
+            method: 'GET',
+            credentials: 'include' // 🍪 Send refreshToken cookie  
+        });
+    } catch (err) {
+        console.warn('Backend logout call failed, clearing local storage anyway:', err);
+    } finally {
+        // Clear local storage regardless
+        localStorage.removeItem('jwtToken');
+        sessionStorage.removeItem('jwtToken');
+        localStorage.removeItem('user');
+        sessionStorage.removeItem('user');
+        // Redirect to login
+        window.location.href = '/user/login';
+    }
+});
+
+// 🔐 Change Password Placeholder
+document.getElementById('changePasswordBtn')?.addEventListener('click', () => {
+    showMessage('🚧 Change password feature coming soon!', 'success');
+});
+
+// 🎨 Initialize avatar initials on load
+document.addEventListener('DOMContentLoaded', () => {
+    // EJS already renders initial values, but sync with stored user if available
+    const stored = localStorage.getItem('user') || sessionStorage.getItem('user');
+    if (stored) {
+        try {
+            const user = JSON.parse(stored);
+            if (user.firstname && user.lastname) {
+                document.getElementById('avatarInitials').textContent = 
+                    `${user.firstname[0]}${user.lastname[0]}`.toUpperCase();
+            }
+        } catch (e) {
+            // Fallback to EJS-rendered values
+        }
+    }
+});
+  // Password visibility toggle
+  document
+    .getElementById("togglePassword")
+    ?.addEventListener("click", function () {        
+    console.log("why is this button not hhh");
+      const passwordInput = document.getElementById("verifyPassword");
+      const isPassword = passwordInput.type === "password";
+      passwordInput.type = isPassword ? "text" : "password";
+      this.textContent = isPassword ? "🙈" : "👁️";
+      this.setAttribute(
+        "aria-label",
+        isPassword ? "Hide password" : "Show password",
+      );
+    });
+</script>

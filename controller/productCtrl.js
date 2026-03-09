@@ -111,7 +111,7 @@ const getAllProductsSorted = asyncHandler(async (req, res) => {
     let queryString = JSON.stringify(queryObj);
     queryString = queryString.replace(
       /\b(gte|gt|lte|lt)\b/g,
-      (match) => `$${match}`
+      (match) => `$${match}`,
     );
     console.log("queryString is ", JSON.parse(queryString));
 

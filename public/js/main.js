@@ -16,30 +16,25 @@ document.addEventListener("DOMContentLoaded", function () {
   const accountButton = document.getElementById("account-icon");
   const cartButton = document.getElementById("cart-icon");
 
-  // Profile actions
-  if (accountButton) {
-    accountButton.addEventListener("click", async () => {
-      try {
-        const response = await fetch("/user/profile", {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`, // Assuming you store the JWT in localStorage
-          },
-        });
-
-        if (response.ok) {
-          const userData = await response.json();
-          console.log("User is logged in:", userData);
-          window.location.href = "/user/profile";
-        } else {
-          console.log("User is not logged in or session expired.");
-          window.location.href = "/user/login";
-        }
-      } catch (error) {
-        console.error("Error checking user status:", error);
-      }
-    });
-  }
+// Profile actions
+if (accountButton) {
+  accountButton.addEventListener("click", (e) => {
+    e.preventDefault();
+    
+    // 🔍 Check if user has a token (client-side pre-check)
+    const token = localStorage.getItem("jwtToken") || sessionStorage.getItem("jwtToken");
+    
+    if (token) {
+      // ✅ User appears logged in → redirect to profile
+      // The isLoggedIn middleware will validate the token server-side
+      window.location.href = "/user/profile";
+    } else {
+      // ❌ No token found → redirect to login
+      console.log("No auth token found, redirecting to login");
+      window.location.href = "/user/login";
+    }
+  });
+}
 
   // Cart actions
   if (cartButton) {

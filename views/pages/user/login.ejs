@@ -1,24 +1,146 @@
 <section class="login-section">
     <div class="container">
-        <h2 class="section-title">Login to Your Account</h2>
-        <form id="loginForm" class="login-form" action="/user/login" method="POST">
+        <h2 class="section-title">Welcome Back</h2>
+        <p class="section-subtitle">Sign in to continue to your account</p>
+
+        <!-- Error message container -->
+        <div id="errorMessage" class="error-message" style="display: none"></div>
+
+        <!-- Success message (for future use) -->
+        <div id="successMessage" class="success-message" style="display: none">
+            Login successful! Redirecting...
+        </div>
+
+        <form id="loginForm" class="login-form">
             <div class="form-group">
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required>
+                <label for="email" class="form-label">Email Address</label>
+                <input type="email" id="email" name="email" class="input-field" required placeholder="you@example.com"
+                    autocomplete="email" />
             </div>
+
             <div class="form-group">
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required>
+                <label for="password" class="form-label">Password</label>
+                <div class="password-wrapper">
+                    <input type="password" id="password" name="password" class="input-field" required
+                        placeholder="••••••••" autocomplete="current-password" />
+                    <button type="button" class="toggle-password" id="togglePassword"
+                        aria-label="Toggle password visibility"><span>Show</span>
+                     </button>
+                </div>
             </div>
-            <button type="submit" class="cta-button">Login</button>
 
-            <p class="form-footer">Don't have an account?
+            <div class="form-options">
+                <label class="remember-me">
+                    <input type="checkbox" id="rememberMe" />
+                    <span>Remember me</span>
+                </label>
+                <a href="/user/forgot-password" class="forgot-link">Forgot password?</a>
+            </div>
 
-                <a href="/user/register">Register here</a>
-
-            </p>
-
+            <button type="submit" class="cta-button" id="submitBtn">
+                <span class="btn-text">Sign In</span>
+                <span class="btn-loader" style="display: none">Logging in...</span>
+            </button>
         </form>
 
+        <div class="form-divider">
+            <span>or</span>
+        </div>
+
+        <p class="form-footer">
+            Don't have an account?
+            <a href="/user/register" class="link-primary">Create one</a>
+        </p>
     </div>
 </section>
+
+<!-- JavaScript (Updated with your fixed token handling + modern UX) -->
+<script>
+  document
+    .getElementById("loginForm")
+    .addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const submitBtn = document.getElementById("submitBtn");
+      const btnText = submitBtn.querySelector(".btn-text");
+      const btnLoader = submitBtn.querySelector(".btn-loader");
+      const errorDiv = document.getElementById("errorMessage");
+      const successDiv = document.getElementById("successMessage");
+
+      // UI: Loading state
+      submitBtn.disabled = true;
+      btnText.style.display = "none";
+      btnLoader.style.display = "inline";
+      errorDiv.style.display = "none";
+      successDiv.style.display = "none";
+
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      const rememberMe = document.getElementById("rememberMe").checked;
+
+      try {
+        const response = await fetch("http://localhost:5000/user/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({ email, password }),
+          credentials: "include", // 🍪 Send cookies for refreshToken
+        });
+
+        const data = await response.json();
+        //console.log("🔍 Login response:", data);//for debugging
+
+        if (!response.ok) {
+          throw new Error(data.message || "Login failed");
+        }
+
+        // Token is at root level (matching your backend)
+        // Inside login.ejs fetch success block:
+        if (data.token) {
+          // Optional: Still store in localStorage for API calls if needed
+          localStorage.setItem("jwtToken", data.token);
+          localStorage.setItem(
+            "user",
+            JSON.stringify({
+              _id: data._id,
+              firstname: data.firstname,
+              lastname: data.lastname,
+              email: data.email,
+              mobile: data.mobile,
+              isAdmin: data.isAdmin,
+            }),
+          );
+
+          // Redirect - browser will auto-send token cookie on next request!
+          const redirectUrl = data.isAdmin
+            ? "/admin/dashboard"
+            : "/user/profile";
+          window.location.href = redirectUrl;
+        }
+      } catch (error) {
+        console.error("Login error:", error);
+        errorDiv.textContent = error.message || "Invalid email or password";
+        errorDiv.style.display = "block";
+        // Reset button
+        submitBtn.disabled = false;
+        btnText.style.display = "inline";
+        btnLoader.style.display = "none";
+      }
+    });
+      // Password visibility toggle
+  document
+    .getElementById("togglePassword")
+    ?.addEventListener("click", function () {        
+    console.log("why is this button not working");
+      const passwordInput = document.getElementById("password");
+      const isPassword = passwordInput.type === "password";
+      passwordInput.type = isPassword ? "text" : "password";
+      this.textContent = isPassword ? "🙈" : "👁️";
+      this.setAttribute(
+        "aria-label",
+        isPassword ? "Hide password" : "Show password",
+      );
+    });
+</script>
