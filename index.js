@@ -23,6 +23,7 @@ const path = require('path');
 // View engine setup
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+//console.log('📁 Views directory:', path.join(__dirname, 'views'));
 
 // Static files middleware
 app.use(express.static(path.join(__dirname, 'public')));
@@ -52,6 +53,7 @@ app.use('/', require('./routes/web/pageRoutes')); // New GUI routes
 //initial development routes
 app.use("/api/user", authRouter);
 app.use("/api/product", productRouter);
+app.use("/api/products", productRouter);
 app.use("/api/cart", cartRouter);
 
 
@@ -61,17 +63,42 @@ app.use("/api/cart", cartRouter);
 const webAuthRouter = require("./routes/Web/webAuthRoute");
 const webProductRouter = require("./routes/Web/webProductRoute");
 const webCartRouter = require("./routes/Web/webCartRoute");
+
 app.use("/", webProductRouter);
 app.use("/home", webProductRouter);
 app.use("/user", webAuthRouter);
-app.use("/product", webProductRouter);
 app.use("/cart", webCartRouter);
+app.use("/product", webProductRouter);
 // index.js modifications for web ///
 
 
 
 app.use(notFound);
 app.use(errorHandler);
+/* //app listening to localhost only
 app.listen(PORT, () => {
     console.log(`Server running on Port ${PORT}`);
+});*/
+
+// app listening to all network interfaces
+const HOST = process.env.HOST || '0.0.0.0'; // 0.0.0.0 = accept connections from any IP
+app.listen(PORT, HOST, () => {
+  console.log(`🚀 Server running on http://${HOST === '0.0.0.0' ? 'localhost' : HOST}:${PORT}`);
+  console.log(`LAN access: http://<YOUR_COMPUTER_IP>:${PORT}`);
+});
+// Graceful shutdown handlers
+process.on('SIGINT', () => {
+  console.log('\n🛑 Received SIGINT. Shutting down gracefully...');
+  server.close(() => {
+    console.log('✅ Server closed');
+    process.exit(0);
+  });
+});
+
+process.on('SIGTERM', () => {
+  console.log('\n🛑 Received SIGTERM. Shutting down gracefully...');
+  server.close(() => {
+    console.log('✅ Server closed');
+    process.exit(0);
+  });
 });

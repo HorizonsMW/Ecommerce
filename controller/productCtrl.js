@@ -1,6 +1,8 @@
 const asyncHandler = require("express-async-handler");
 const Product = require("../models/productModel");
 const slugify = require("slugify");
+const mongoose = require('mongoose');
+
 
 //new Product
 const createProduct = asyncHandler(async (req, res) => {
@@ -37,17 +39,6 @@ const deleteAProduct = asyncHandler(async (req, res) => {
   try {
     const deleteProduct = await Product.findByIdAndDelete(id);
     res.json(deleteProduct);
-  } catch (error) {
-    throw new Error(error);
-  }
-});
-
-//get one Product
-const getAProduct = asyncHandler(async (req, res) => {
-  const { id } = req.params;
-  try {
-    const findProduct = await Product.findById(id);
-    res.json(findProduct);
   } catch (error) {
     throw new Error(error);
   }
@@ -188,6 +179,132 @@ const getAllProductsSorted = asyncHandler(async (req, res) => {
   }
 });
 
+
+////////////////
+// Get all unique filter values from products in database
+// controller/productCtrl.js
+// Get all unique filter values from products in database
+const getProductFilters = asyncHandler(async (req, res) => {
+    // Get unique values for each filterable field
+    const [categories, brands, colors, priceStats] = await Promise.all([
+        Product.distinct('category'),
+        Product.distinct('brand'),
+        Product.distinct('color'),
+        Product.aggregate([
+            {
+                $group: {
+                    _id: null,
+                    minPrice: { $min: '$price' },
+                    maxPrice: { $max: '$price' }
+                }
+            }
+        ])
+    ]);
+
+    // Generate dynamic price ranges based on actual data
+    const minPrice = priceStats[0]?.minPrice || 0;
+    const maxPrice = priceStats[0]?.maxPrice || 10000;
+    const priceRanges = generateDynamicPriceRanges(minPrice, maxPrice);
+
+    res.json({
+        success: true, 
+            categories: categories.sort(),
+            brands: brands.sort(),
+            colors: colors.sort(),
+            priceRanges,
+            priceStats: { min: minPrice, max: maxPrice }
+        }    );
+});
+
+// Helper: Generate sensible price ranges based on actual product prices
+function generateDynamicPriceRanges(min, max) {
+    const ranges = [];
+    
+    // Always include "Under $500" if any products are below that
+    if (min < 500) {
+        ranges.push({ label: 'Under $500', value: '0-500', min: 0, max: 499.99 });
+    }
+    
+    // Add ranges in $500 increments up to max
+    let start = Math.max(500, Math.floor(min / 500) * 500);
+    while (start < max) {
+        const end = start + 499.99;
+        if (end >= max) {
+            ranges.push({ label: `$${start.toLocaleString()}+`, value: `${start}+`, min: start, max: Infinity });
+            break;
+        }
+        ranges.push({ 
+            label: `$${start.toLocaleString()} - $${(start + 499).toLocaleString()}`, 
+            value: `${start}-${start + 499}`,
+            min: start,
+            max: start + 499
+        });
+        start += 500;
+    }
+    
+    return ranges;
+}
+/////////////////////
+
+
+// get related products:
+const getRelatedProducts = asyncHandler(async (req, res) => {
+    const { productId, category } = req.query;  // ← From query string, not params
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10;
+    const skip = (page - 1) * limit;
+
+    if (!category) {
+        return res.status(400).json({ message: 'Category is required' });
+    }
+
+    // Build query using category (string) and optional productId (ObjectId)
+    const query = { category };  // ← category is a string, this is fine
+    
+    // Only add _id filter if productId is a valid ObjectId
+    const mongoose = require('mongoose');
+    if (productId && mongoose.Types.ObjectId.isValid(productId)) {
+        query._id = { $ne: productId };  // Exclude current product
+    }
+
+    const [products, total] = await Promise.all([
+        Product.find(query)  // ← find() accepts string fields like category
+            .select('title slug price brand category color images quantity sold ratings createdAt')
+            .sort('-createdAt')
+            .skip(skip)
+            .limit(limit),
+        Product.countDocuments(query)
+    ]);
+
+    res.json({
+        success: true,
+        count: products.length,
+        total,
+        page,
+        pages: Math.ceil(total / limit),
+         products
+    });
+});
+
+
+
+//get one Product
+const getAProduct = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  // Validate MongoDB ObjectId format BEFORE querying
+   if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ 
+            message: `Invalid product ID format: "${id}"` 
+        });
+    }
+  try {
+    const findProduct = await Product.findById(id);
+    res.json(findProduct);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
 //export functions
 module.exports = {
   createProduct,
@@ -196,4 +313,6 @@ module.exports = {
   updateProduct,
   deleteAProduct,
   getAllProductsSorted,
+  getRelatedProducts,
+  getProductFilters,
 };

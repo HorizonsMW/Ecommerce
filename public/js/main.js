@@ -2,6 +2,38 @@
 function changeMainImage(imageUrl) {
   document.getElementById("mainProductImage").src = imageUrl;
 }
+// Helper: Get total pages by counting pagination number buttons
+function getTotalPagesFromDOM() {
+  const pageButtons = document.querySelectorAll(".pagination-number");
+  // console.log(`From array, pages is ${pageButtons.length}`);
+  return pageButtons.length;
+}
+// Helper: Get current page from the active button
+function getCurrentPageFromDOM() {
+  const activeBtn = document.querySelector(".pagination-number.active");
+  console.log(
+    `Active page from DOM is ${activeBtn ? parseInt(activeBtn.dataset.page) : 1}`,
+  );
+  return activeBtn ? parseInt(activeBtn.dataset.page) : 1;
+}
+
+function navigateToPage(page) {
+  // Get current state from DOM
+  const totalPages = getTotalPagesFromDOM();
+
+  // Validate page bounds
+  if (page < 1 || page > totalPages) {
+    console.warn(`⚠️ Invalid page: ${page} (valid: 1-${totalPages})`);
+    return;
+  }
+
+  // Build new URL preserving all existing params
+  const url = new URL(window.location);
+  url.searchParams.set("page", page.toString());
+
+  // Navigate (reload)
+  window.location.href = url.toString();
+}
 
 // Products page functionality
 document.addEventListener("DOMContentLoaded", function () {
@@ -16,25 +48,40 @@ document.addEventListener("DOMContentLoaded", function () {
   const accountButton = document.getElementById("account-icon");
   const cartButton = document.getElementById("cart-icon");
 
-// Profile actions
-if (accountButton) {
-  accountButton.addEventListener("click", (e) => {
-    e.preventDefault();
-    
-    // 🔍 Check if user has a token (client-side pre-check)
-    const token = localStorage.getItem("jwtToken") || sessionStorage.getItem("jwtToken");
-    
-    if (token) {
-      // ✅ User appears logged in → redirect to profile
-      // The isLoggedIn middleware will validate the token server-side
-      window.location.href = "/user/profile";
-    } else {
-      // ❌ No token found → redirect to login
-      console.log("No auth token found, redirecting to login");
-      window.location.href = "/user/login";
-    }
-  });
-}
+  // ========================================
+  // SERVER-SIDE PAGINATION (URL-Based)
+  // ========================================
+
+  // Get pagination elements
+  const paginationNumbers = document.getElementById("paginationNumbers");
+  const prevButton = document.getElementById("prevPage");
+  const nextButton = document.getElementById("nextPage");
+
+  // Read current state from EJS-rendered data attributes or global vars
+  const currentPage = parseInt(getCurrentPageFromDOM() || "1");
+  const totalPages = parseInt(getTotalPagesFromDOM() || "1");
+  console.log(`📄 Pagination: Page ${currentPage} of ${totalPages}`);
+
+  // Profile actions
+  if (accountButton) {
+    accountButton.addEventListener("click", (e) => {
+      e.preventDefault();
+
+      // 🔍 Check if user has a token (client-side pre-check)
+      const token =
+        localStorage.getItem("jwtToken") || sessionStorage.getItem("jwtToken");
+
+      if (token) {
+        // ✅ User appears logged in → redirect to profile
+        // The isLoggedIn middleware will validate the token server-side
+        window.location.href = "/user/profile";
+      } else {
+        // ❌ No token found → redirect to login
+        console.log("No auth token found, redirecting to login");
+        window.location.href = "/user/login";
+      }
+    });
+  }
 
   // Cart actions
   if (cartButton) {
@@ -74,19 +121,19 @@ if (accountButton) {
             case "price-low":
               return (
                 parseFloat(
-                  a.querySelector(".product-price").textContent.match(/\d+/)[0]
+                  a.querySelector(".product-price").textContent.match(/\d+/)[0],
                 ) -
                 parseFloat(
-                  b.querySelector(".product-price").textContent.match(/\d+/)[0]
+                  b.querySelector(".product-price").textContent.match(/\d+/)[0],
                 )
               );
             case "price-high":
               return (
                 parseFloat(
-                  b.querySelector(".product-price").textContent.match(/\d+/)[0]
+                  b.querySelector(".product-price").textContent.match(/\d+/)[0],
                 ) -
                 parseFloat(
-                  a.querySelector(".product-price").textContent.match(/\d+/)[0]
+                  a.querySelector(".product-price").textContent.match(/\d+/)[0],
                 )
               );
             case "name-asc":
@@ -94,14 +141,14 @@ if (accountButton) {
                 .querySelector(".product-title")
                 .textContent.trim()
                 .localeCompare(
-                  b.querySelector(".product-title").textContent.trim()
+                  b.querySelector(".product-title").textContent.trim(),
                 );
             case "name-desc":
               return b
                 .querySelector(".product-title")
                 .textContent.trim()
                 .localeCompare(
-                  a.querySelector(".product-title").textContent.trim()
+                  a.querySelector(".product-title").textContent.trim(),
                 );
             case "newest":
               return new Date(b.dataset.date) - new Date(a.dataset.date);
@@ -145,19 +192,19 @@ if (accountButton) {
   if (filterOkButton) {
     filterOkButton.addEventListener("click", function () {
       const selectedCategories = Array.from(
-        document.querySelectorAll('input[name="category"]:checked')
+        document.querySelectorAll('input[name="category"]:checked'),
       ).map((cb) => cb.value);
       const selectedPrices = Array.from(
-        document.querySelectorAll('input[name="price"]:checked')
+        document.querySelectorAll('input[name="price"]:checked'),
       ).map((cb) => cb.value);
       const selectedBrands = Array.from(
-        document.querySelectorAll('input[name="brand"]:checked')
+        document.querySelectorAll('input[name="brand"]:checked'),
       ).map((cb) => cb.value);
       const selectedColors = Array.from(
-        document.querySelectorAll('input[name="color"]:checked')
+        document.querySelectorAll('input[name="color"]:checked'),
       ).map((cb) => cb.value);
       const selectedAvailability = Array.from(
-        document.querySelectorAll('input[name="availability"]:checked')
+        document.querySelectorAll('input[name="availability"]:checked'),
       ).map((cb) => cb.value);
 
       // Get current sort value
@@ -170,11 +217,19 @@ if (accountButton) {
         const productBrand = product.dataset.brand;
         const productColor = product.dataset.color;
         const productQuantity = parseInt(product.dataset.quantity);
-
+        /*
         // Check if product matches any selected category
         const categoryMatch =
           selectedCategories.length === 0 ||
-          selectedCategories.includes(productCategory);
+          selectedCategories.includes(productCategory);*/
+
+        // 🔥 REPLACE WITH THIS (normalized matching):
+        const categoryMatch =
+          selectedCategories.length === 0 ||
+          selectedCategories.some(
+            (sel) =>
+              normalizeCategory(sel) === normalizeCategory(productCategory),
+          );
 
         // Check if product price is within any selected range
         const priceMatch =
@@ -220,7 +275,7 @@ if (accountButton) {
       // Add filtered products
       if (filteredProducts.length > 0) {
         filteredProducts.forEach((product) =>
-          productsGrid.appendChild(product)
+          productsGrid.appendChild(product),
         );
       } else {
         productsGrid.innerHTML =
@@ -242,19 +297,19 @@ if (accountButton) {
             case "price-low":
               return (
                 parseFloat(
-                  a.querySelector(".product-price").textContent.match(/\d+/)[0]
+                  a.querySelector(".product-price").textContent.match(/\d+/)[0],
                 ) -
                 parseFloat(
-                  b.querySelector(".product-price").textContent.match(/\d+/)[0]
+                  b.querySelector(".product-price").textContent.match(/\d+/)[0],
                 )
               );
             case "price-high":
               return (
                 parseFloat(
-                  b.querySelector(".product-price").textContent.match(/\d+/)[0]
+                  b.querySelector(".product-price").textContent.match(/\d+/)[0],
                 ) -
                 parseFloat(
-                  a.querySelector(".product-price").textContent.match(/\d+/)[0]
+                  a.querySelector(".product-price").textContent.match(/\d+/)[0],
                 )
               );
             case "name-asc":
@@ -262,14 +317,14 @@ if (accountButton) {
                 .querySelector(".product-title")
                 .textContent.trim()
                 .localeCompare(
-                  b.querySelector(".product-title").textContent.trim()
+                  b.querySelector(".product-title").textContent.trim(),
                 );
             case "name-desc":
               return b
                 .querySelector(".product-title")
                 .textContent.trim()
                 .localeCompare(
-                  a.querySelector(".product-title").textContent.trim()
+                  a.querySelector(".product-title").textContent.trim(),
                 );
             case "newest":
               return new Date(b.dataset.date) - new Date(a.dataset.date);
@@ -300,7 +355,7 @@ if (accountButton) {
     });
   }
 
-  // Sorting functionality
+  /*  // Sorting functionality - limitation - sorting only displayed products. New sort fixes this
   if (sortSelect) {
     sortSelect.addEventListener("change", function () {
       const products = Array.from(document.querySelectorAll(".product-card"));
@@ -311,19 +366,19 @@ if (accountButton) {
           case "price-low":
             return (
               parseFloat(
-                a.querySelector(".product-price").textContent.match(/\d+/)[0]
+                a.querySelector(".product-price").textContent.match(/\d+/)[0],
               ) -
               parseFloat(
-                b.querySelector(".product-price").textContent.match(/\d+/)[0]
+                b.querySelector(".product-price").textContent.match(/\d+/)[0],
               )
             );
           case "price-high":
             return (
               parseFloat(
-                b.querySelector(".product-price").textContent.match(/\d+/)[0]
+                b.querySelector(".product-price").textContent.match(/\d+/)[0],
               ) -
               parseFloat(
-                a.querySelector(".product-price").textContent.match(/\d+/)[0]
+                a.querySelector(".product-price").textContent.match(/\d+/)[0],
               )
             );
           case "name-asc":
@@ -331,14 +386,14 @@ if (accountButton) {
               .querySelector(".product-title")
               .textContent.trim()
               .localeCompare(
-                b.querySelector(".product-title").textContent.trim()
+                b.querySelector(".product-title").textContent.trim(),
               );
           case "name-desc":
             return b
               .querySelector(".product-title")
               .textContent.trim()
               .localeCompare(
-                a.querySelector(".product-title").textContent.trim()
+                a.querySelector(".product-title").textContent.trim(),
               );
           case "newest":
             return new Date(b.dataset.date) - new Date(a.dataset.date);
@@ -351,10 +406,32 @@ if (accountButton) {
 
       products.forEach((product) => productsGrid.appendChild(product));
     });
-  }
+  } */
 
-  // Pagination functionality
-  const productsPerPage = 12;
+  // New sort functionality
+
+  // Sorting functionality - SERVER-SIDE via URL params
+  if (sortSelect) {
+    sortSelect.addEventListener("change", function () {
+      const sortValue = this.value;
+      if (!sortValue) return; // Ignore empty selection
+
+      // Build new URL with sort param, reset to page 1
+      const url = new URL(window.location);
+      url.searchParams.set("sort", sortValue);
+      url.searchParams.set("page", "1"); // Reset to first page when sorting
+
+      // Preserve existing filter params if any
+      // (filters are already in URL if you implemented dynamic filters)
+
+      // Redirect to reload with new sort
+      window.location.href = url.toString();
+    });
+  }
+  ///
+  /* COMMENT ALL OLD PAGINATION FUNCTIONS
+  // Pagination functionality - old pagination - not in use - after implement server side sorting where products span multiple pages
+  const productsPerPage = 10;
   const paginationNumbers = document.getElementById("paginationNumbers");
   const prevButton = document.getElementById("prevPage");
   const nextButton = document.getElementById("nextPage");
@@ -391,6 +468,7 @@ if (accountButton) {
     });
   }
 
+  // all old pagination commented
   function goToPage(page) {
     currentPage = page;
     updatePagination();
@@ -399,8 +477,8 @@ if (accountButton) {
     if (productsGrid) {
       productsGrid.scrollIntoView({ behavior: "smooth" });
     }
-  }
-
+  };  */
+  /*
   if (prevButton) {
     prevButton.addEventListener("click", () => {
       if (currentPage > 1) {
@@ -412,7 +490,7 @@ if (accountButton) {
   if (nextButton) {
     nextButton.addEventListener("click", () => {
       const totalPages = Math.ceil(
-        document.querySelectorAll(".product-card").length / productsPerPage
+        document.querySelectorAll(".product-card").length / productsPerPage,
       );
       if (currentPage < totalPages) {
         goToPage(currentPage + 1);
@@ -423,18 +501,68 @@ if (accountButton) {
   // Initialize pagination if elements exist
   if (paginationNumbers) {
     updatePagination();
+  } */
+
+  //begining of new pagination
+
+  // Add event listeners
+  if (prevButton) {
+    prevButton.addEventListener("click", (e) => {
+      e.preventDefault();
+      if (currentPage > 1) {
+        page = currentPage - 1;
+        navigateToPage(page);
+      }
+    });
   }
 
-  /*// Sort products by newest first on page load
-    if (sortSelect) {
-        sortSelect.value = 'newest';
-        const products = Array.from(document.querySelectorAll('.product-card'));
-        
-        products.sort((a, b) => {
-            return new Date(b.dataset.date) - new Date(a.dataset.date);
-        });
-
-        products.forEach(product => productsGrid.appendChild(product));
-        updatePagination();
-    }*/ //Resolved using getAllProductsSorted instead of getAllProducts
+  if (nextButton) {
+    nextButton.addEventListener("click", (e) => {
+      e.preventDefault();
+      if (currentPage < totalPages) {
+        page = currentPage + 1;
+        navigateToPage(page);
+      }
+    });
+    // Add listeners to page number buttons
+    paginationNumbers.querySelectorAll(".pagination-number").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        console.log(
+          `Page number works? Current page is ${currentPage}, total pages ${totalPages}`,
+        );
+        const page = parseInt(btn.dataset.page);
+        //console.log(page);
+        if (page && page !== currentPage) {
+          // navigate to page
+          // Build new URL preserving all existing params except page
+          const url = new URL(window.location);
+          url.searchParams.set("page", page.toString());
+          // Option A: Simple reload (recommended for SEO + simplicity)
+          window.location.href = url.toString();
+        }
+      });
+    });
+  }
 });
+
+// Add this helper function at the top of your DOMContentLoaded block
+// or outside the event listener for reusability
+
+function normalizeCategory(category) {
+  if (!category) return "";
+  const lower = category.toLowerCase().trim();
+
+  // Map singular filter values to plural database values
+  const mapping = {
+    smartphone: "smartphones",
+    tablet: "tablets",
+    laptop: "laptops",
+    smartwatch: "smartwatches",
+    headphone: "headphones",
+    earbud: "earbuds",
+    accessory: "accessories",
+  };
+
+  return mapping[lower] || lower;
+}

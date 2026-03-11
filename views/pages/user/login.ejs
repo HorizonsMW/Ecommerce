@@ -1,57 +1,57 @@
 <section class="login-section">
-    <div class="container">
-        <h2 class="section-title">Welcome Back</h2>
-        <p class="section-subtitle">Sign in to continue to your account</p>
+  <div class="container">
+    <h2 class="section-title">Welcome Back</h2>
+    <p class="section-subtitle">Sign in to continue to your account</p>
 
-        <!-- Error message container -->
-        <div id="errorMessage" class="error-message" style="display: none"></div>
+    <!-- Error message container -->
+    <div id="errorMessage" class="error-message" style="display: none"></div>
 
-        <!-- Success message (for future use) -->
-        <div id="successMessage" class="success-message" style="display: none">
-            Login successful! Redirecting...
-        </div>
-
-        <form id="loginForm" class="login-form">
-            <div class="form-group">
-                <label for="email" class="form-label">Email Address</label>
-                <input type="email" id="email" name="email" class="input-field" required placeholder="you@example.com"
-                    autocomplete="email" />
-            </div>
-
-            <div class="form-group">
-                <label for="password" class="form-label">Password</label>
-                <div class="password-wrapper">
-                    <input type="password" id="password" name="password" class="input-field" required
-                        placeholder="••••••••" autocomplete="current-password" />
-                    <button type="button" class="toggle-password" id="togglePassword"
-                        aria-label="Toggle password visibility"><span>Show</span>
-                     </button>
-                </div>
-            </div>
-
-            <div class="form-options">
-                <label class="remember-me">
-                    <input type="checkbox" id="rememberMe" />
-                    <span>Remember me</span>
-                </label>
-                <a href="/user/forgot-password" class="forgot-link">Forgot password?</a>
-            </div>
-
-            <button type="submit" class="cta-button" id="submitBtn">
-                <span class="btn-text">Sign In</span>
-                <span class="btn-loader" style="display: none">Logging in...</span>
-            </button>
-        </form>
-
-        <div class="form-divider">
-            <span>or</span>
-        </div>
-
-        <p class="form-footer">
-            Don't have an account?
-            <a href="/user/register" class="link-primary">Create one</a>
-        </p>
+    <!-- Success message (for future use) -->
+    <div id="successMessage" class="success-message" style="display: none">
+      Login successful! Redirecting...
     </div>
+
+    <form id="loginForm" class="login-form">
+      <div class="form-group">
+        <label for="email" class="form-label">Email Address</label>
+        <input type="email" id="email" name="email" class="input-field" required placeholder="you@example.com"
+          autocomplete="email" />
+      </div>
+
+      <div class="form-group">
+        <label for="password" class="form-label">Password</label>
+        <div class="password-wrapper">
+          <input type="password" id="password" name="password" class="input-field" required placeholder="••••••••"
+            autocomplete="current-password" />
+          <button type="button" class="toggle-password" id="togglePassword"
+            aria-label="Toggle password visibility"><span>Show</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="form-options">
+        <label class="remember-me">
+          <input type="checkbox" id="rememberMe" />
+          <span>Remember me</span>
+        </label>
+        <a href="/user/forgot-password" class="forgot-link">Forgot password?</a>
+      </div>
+
+      <button type="submit" class="cta-button" id="submitBtn">
+        <span class="btn-text">Sign In</span>
+        <span class="btn-loader" style="display: none">Logging in...</span>
+      </button>
+    </form>
+
+    <div class="form-divider">
+      <span>or</span>
+    </div>
+
+    <p class="form-footer">
+      Don't have an account?
+      <a href="/user/register" class="link-primary">Create one</a>
+    </p>
+  </div>
 </section>
 
 <!-- JavaScript (Updated with your fixed token handling + modern UX) -->
@@ -78,8 +78,13 @@
       const password = document.getElementById("password").value;
       const rememberMe = document.getElementById("rememberMe").checked;
 
+      // After (for testing) - log on LAN device fails if fetch is localhost, changing to API_BASE
+      const API_BASE = window.location.hostname === 'localhost'
+        ? 'http://localhost:5000/api'
+        : `http://${window.location.hostname}:5000/api`;
+
       try {
-        const response = await fetch("http://localhost:5000/user/login", {
+        const response = await fetch(`${API_BASE}/user/login`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -129,11 +134,11 @@
         btnLoader.style.display = "none";
       }
     });
-      // Password visibility toggle
+  // Password visibility toggle
   document
     .getElementById("togglePassword")
-    ?.addEventListener("click", function () {        
-    console.log("why is this button not working");
+    ?.addEventListener("click", function () {
+      console.log("why is this button not working");
       const passwordInput = document.getElementById("password");
       const isPassword = passwordInput.type === "password";
       passwordInput.type = isPassword ? "text" : "password";
