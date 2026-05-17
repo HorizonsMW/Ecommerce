@@ -566,3 +566,77 @@ function normalizeCategory(category) {
 
   return mapping[lower] || lower;
 }
+// Mobile Filters Toggle - for products// Mobile Filters Toggle - FIXED to prevent duplicate overlays
+document.addEventListener('DOMContentLoaded', () => {
+  const filterToggle = document.getElementById('filterToggle');
+  const filtersColumn = document.querySelector('.filters-column');
+  const filterOkButton = document.querySelector('.filter-ok-button');
+  const filterResetButton = document.querySelector('.filter-reset-button');
+  
+  // ✅ Create overlay ONCE, only if it doesn't exist
+  let overlay = document.querySelector('.filters-overlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.className = 'filters-overlay';
+    document.body.appendChild(overlay);
+  }
+  
+  // Toggle filters on mobile
+  if (filterToggle && filtersColumn) {
+    filterToggle.addEventListener('click', () => {
+      filtersColumn.classList.add('active');
+      overlay.classList.add('active');
+      document.body.style.overflow = 'hidden'; // Prevent background scroll
+      document.body.style.zIndex = '20'; // Prevent background scroll
+    });
+  }
+  
+  // Close filters when clicking OK, Reset, or overlay
+  const closeFilters = () => {
+    filtersColumn?.classList.remove('active');
+    overlay?.classList.remove('active');
+    document.body.style.overflow = '';
+  };
+  
+  filterOkButton?.addEventListener('click', closeFilters);
+  filterResetButton?.addEventListener('click', closeFilters);
+  overlay?.addEventListener('click', closeFilters);
+  
+  // Close on Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && filtersColumn?.classList.contains('active')) {
+      closeFilters();
+    }
+  });
+  
+  // ... rest of your existing DOMContentLoaded code ...
+}); //products functions end
+
+// ========================================
+// BOTTOM NAV: AUTO-ACTIVE LINK
+// ========================================
+
+document.addEventListener('DOMContentLoaded', () => {
+  
+  // Get current path (e.g., "/products", "/", "/user/profile")
+  const currentPath = window.location.pathname.replace(/\/$/, '') || '/';
+  console.log('🔍 Nav debug:', {
+    currentPath,
+    activeLink: document.querySelector('.bottom-nav-link.active')?.href
+  });
+  
+  // Get all bottom nav links
+  const navLinks = document.querySelectorAll('.bottom-nav-link');
+  
+  navLinks.forEach(link => {
+    // Get link's href path (also normalize trailing slash)
+    const linkPath = link.getAttribute('href')?.replace(/\/$/, '') || '/';
+    
+    // Check for exact match OR if current path starts with link path (for nested routes)
+    if (currentPath === linkPath || currentPath.startsWith(linkPath + '/')) {
+      // Remove active from all, add to this one
+      navLinks.forEach(l => l.classList.remove('active'));
+      link.classList.add('active');
+    }
+  });
+});

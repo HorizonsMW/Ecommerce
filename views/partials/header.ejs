@@ -1,24 +1,67 @@
 <!-- views/partials/header.ejs -->
-<header>
+<header class="glass-header">
     <div class="container">
         <div class="header-content">
-          <div class="logo">Horizons <span>Shop</span></div>
-          <div class="header-actions">
-            <div class="account-icon" id="account-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 12C14.2091 12 16 10.2091 16 8C16 5.79086 14.2091 4 12 4C9.79086 4 8 5.79086 8 8C8 10.2091 9.79086 12 12 12Z" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M18 20C18 17.7909 15.3137 16 12 16C8.68629 16 6 17.7909 6 20" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
+            <!-- Search Bar -->
+            <div class="search-container">
+                <form class="search-form" action="/products" method="GET">
+                    <input 
+                        type="search" 
+                        name="q" 
+                        placeholder="Search products..." 
+                        class="search-input"
+                        aria-label="Search products"
+                    >
+                    <button type="submit" class="search-button" aria-label="Search">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="M21 21l-4.35-4.35"></path>
+                        </svg>
+                    </button>
+                </form>
             </div>
-            <div class="cart-icon" id="cart-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M6 2L3 6V20C3 20.5304 3.21071 21.0391 3.58579 21.4142C3.96086 21.7893 4.46957 22 5 22H19C19.5304 22 20.0391 21.7893 20.4142 21.4142C20.7893 21.0391 21 20.5304 21 20V6L18 2H6Z" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M3 6H21" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M16 10C16 11.0609 15.5786 12.0783 14.8284 12.8284C14.0783 13.5786 13.0609 14 12 14C10.9391 14 9.92172 13.5786 9.17157 12.8284C8.42143 12.0783 8 11.0609 8 10" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-              <div class="cart-count">3</div>
+
+            <!-- Header Actions -->
+            <div class="header-actions">
+                <!-- Account -->
+                <a href="/user/profile" class="header-action" title="Account">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    <span class="action-label">Account</span>
+                </a>
+
+                <!-- Cart -->
+                <a href="/cart" class="header-action" title="Cart">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="9" cy="21" r="1"></circle>
+                        <circle cx="20" cy="21" r="1"></circle>
+                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                    </svg>
+                    <span class="action-label">Cart</span>
+                    <span class="action-badge" id="header-cart-count">3</span>
+                </a>
             </div>
-          </div>
         </div>
-      </div>
+    </div>
 </header>
+
+<script>
+    // Mobile menu toggle for sidebar
+    document.getElementById('mobileMenuToggle')?.addEventListener('click', () => {
+        document.querySelector('.sidebar')?.classList.toggle('active');
+    });
+
+    // Close sidebar when clicking outside on mobile
+    document.addEventListener('click', (e) => {
+        const sidebar = document.querySelector('.sidebar');
+        const toggle = document.getElementById('mobileMenuToggle');
+        if (window.innerWidth <= 1024 && 
+            sidebar?.classList.contains('active') && 
+            !sidebar.contains(e.target) && 
+            !toggle?.contains(e.target)) {
+            sidebar.classList.remove('active');
+        }
+    });
+</script>

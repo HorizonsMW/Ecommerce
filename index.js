@@ -4,6 +4,7 @@ const app = express();
 const dotenv = require('dotenv').config();
 const authRouter = require("./routes/APIs/authRoute");
 const productRouter = require("./routes/APIs/productRoute");
+const webCategoriesRouter = require("./routes/Web/webCategoriesRoute");
 const cartRouter = require("./routes/APIs/cartRoute");
 const bodyParser = require('body-parser');
 const { notFound, errorHandler } = require('./middlewares/errorHandler');
@@ -69,6 +70,7 @@ app.use("/home", webProductRouter);
 app.use("/user", webAuthRouter);
 app.use("/cart", webCartRouter);
 app.use("/product", webProductRouter);
+app.use("/categories", webCategoriesRouter);
 // index.js modifications for web ///
 
 
