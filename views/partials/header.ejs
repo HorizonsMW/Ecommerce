@@ -46,22 +46,3 @@
         </div>
     </div>
 </header>
-
-<script>
-    // Mobile menu toggle for sidebar
-    document.getElementById('mobileMenuToggle')?.addEventListener('click', () => {
-        document.querySelector('.sidebar')?.classList.toggle('active');
-    });
-
-    // Close sidebar when clicking outside on mobile
-    document.addEventListener('click', (e) => {
-        const sidebar = document.querySelector('.sidebar');
-        const toggle = document.getElementById('mobileMenuToggle');
-        if (window.innerWidth <= 1024 && 
-            sidebar?.classList.contains('active') && 
-            !sidebar.contains(e.target) && 
-            !toggle?.contains(e.target)) {
-            sidebar.classList.remove('active');
-        }
-    });
-</script>

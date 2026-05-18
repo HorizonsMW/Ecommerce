@@ -18,6 +18,7 @@ const {
   isLoggedIn,
 } = require("../../middlewares/authMiddleware");
 const router = express.Router();
+const asyncHandler = require('express-async-handler');
 
 
 
@@ -44,10 +45,55 @@ router.get("/register", async (req, res) => {
   }); // New user creation
 
 
-router.post("/login", loginUserCtrl); // User login
+///router.post("/login", loginUserCtrl); // User login
+// New login route to handle redirect params
+// Helper: Detect if request expects JSON (API) or HTML (web page)
+
+const isApiRequest = (req) => {
+  return req.headers['accept']?.includes('application/json') || 
+         req.path.startsWith('/api');
+};
+
+// POST /login - Wrapper to handle redirect for web requests
+router.post('/login', asyncHandler(async (req, res, next) => {
+  const redirectUrl = req.query.redirect || '/user/profile';
+  const isWeb = !isApiRequest(req);
+  
+  if (isWeb) {
+    // 🎯 For web requests: Override res.json to redirect instead of sending JSON
+    const originalJson = res.json.bind(res);
+    
+    res.json = function(data) {
+      // Successful login: controller returns { token, user... }
+      if (data?.token) {
+        // Cookies are already set by controller → just redirect
+        return res.redirect(redirectUrl);
+      }
+      
+      // Failed login: controller returns { message: "..." }
+      // Render login page with error
+      return res.render('pages/user/login', {
+        title: 'Login',
+        error: data?.message || 'Login failed',
+        email: req.body?.email || '', // Preserve email for UX
+        layout: 'layouts/main'
+      });
+    };
+  }
+  
+  // Call the original controller (unchanged)
+  // It will use our overridden res.json for web requests
+  await loginUserCtrl(req, res, next);
+}));
+
+
 router.get("/login", async (req, res) => {
   try {
     console.log("loading login");
+    // Only redirect to profile if already logged in
+    if (req.user) {
+      return res.redirect('/user/profile');
+    }
     res.render("pages/user/login", { title: "Login", layout: "layouts/main" });
     
   } catch (error) {

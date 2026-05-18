@@ -46,7 +46,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const filterResetButton = document.querySelector(".filter-reset-button");
   const allProducts = Array.from(document.querySelectorAll(".product-card"));
   const accountButton = document.getElementById("account-icon");
-  const cartButton = document.getElementById("cart-icon");
 
   // ========================================
   // SERVER-SIDE PAGINATION (URL-Based)
@@ -83,12 +82,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Cart actions
-  if (cartButton) {
-    cartButton.addEventListener("click", () => {
-      console.log("Cart clicked");
-    });
-  }
   // Reset filters
   if (filterResetButton) {
     filterResetButton.addEventListener("click", function () {
@@ -640,3 +633,283 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
+/// Night day theme toggle
+// In main.js
+document.getElementById('themeToggle')?.addEventListener('click', () => {
+  document.documentElement.setAttribute('data-theme', 
+    document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+});
+
+// In main.js - Add Scroll Progress Indicator
+window.addEventListener('scroll', () => {
+  const scrollProgress = document.querySelector('.scroll-progress');
+  if (scrollProgress) {
+    const scrollTop = document.documentElement.scrollTop;
+    const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    scrollProgress.style.width = `${(scrollTop / scrollHeight) * 100}%`;
+  }
+});
+
+// ========================================
+// CART FUNCTIONALITY - GLOBAL (main.js)
+// ========================================
+// ========================================
+// CART FUNCTIONALITY - GLOBAL (main.js)
+// ========================================
+
+/**
+ * Add product to cart with visual feedback
+ * Redirects to login if user is not authenticated
+ * @param {Object} product - Product data {_id, title, price, image, quantity}
+ * @param {HTMLElement} button - The clicked add-to-cart button
+ */
+async function addToCart(product, button = null) {
+  console.log('🛒 addToCart called:', { product, button: !!button }); // Debug log
+  
+  // Prevent duplicate clicks
+  if (button) {
+    button.disabled = true;
+    const originalContent = button.innerHTML;
+    button.innerHTML = '<span class="btn-loader">Adding...</span>';
+  }
+
+  try {
+    // Check if user is logged in (has token)
+    const token = localStorage.getItem('jwtToken') || sessionStorage.getItem('jwtToken');
+    console.log('🔑 Token check:', !!token);
+    
+    if (!token) {
+      // ❌ Not logged in: Redirect to login with return URL
+      showCartToast(product.title, 'Please login to add to cart', 'error');
+      
+      // Delay redirect slightly so user sees the toast
+      setTimeout(() => {
+        const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
+        window.location.href = `/user/login?redirect=${returnUrl}&action=add-to-cart&productId=${product._id}`;
+      }, 1500);
+      return;
+    }
+    
+    // ✅ Logged in: Proceed with API call
+    const response = await fetch('/api/cart/add', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ 
+        productId: product._id, 
+        quantity: 1 
+      }),
+      credentials: 'include'
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to add to cart');
+    }
+
+    const result = await response.json();
+    updateCartCount(result.cartCount);
+    showCartToast(product.title, `Added to cart!`);
+
+  } catch (error) {
+    console.error('Add to cart error:', error);
+    showCartToast(product.title, error.message || 'Failed to add', 'error');
+  } finally {
+    // Restore button state
+    if (button) {
+      button.disabled = false;
+      if (button.querySelector('.btn-loader')) {
+        button.innerHTML = originalContent;
+      }
+    }
+  }
+}
+
+/**
+ * Handle pending cart action after login redirect
+ */
+async function handlePendingCartAction() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const action = urlParams.get('action');
+  const productId = urlParams.get('productId');
+  
+  if (action === 'add-to-cart' && productId) {
+    window.history.replaceState({}, document.title, window.location.pathname);
+    
+    try {
+      const response = await fetch(`/api/products/${productId}`);
+      if (!response.ok) throw new Error('Product not found');
+      
+      const product = await response.json();
+      await addToCart(product);
+    } catch (error) {
+      console.error('Failed to complete pending cart action:', error);
+      showCartToast('Product', 'Could not add to cart', 'error');
+    }
+  }
+}
+
+/**
+ * Update cart count badge in header
+ */
+function updateCartCount(count) {
+  const cartCountEl = document.querySelector('.cart-count');
+  if (cartCountEl) {
+    cartCountEl.textContent = count;
+    cartCountEl.style.display = count > 0 ? 'flex' : 'none';
+    
+    // Animate badge
+    cartCountEl.animate([
+      { transform: 'scale(1)' },
+      { transform: 'scale(1.3)' },
+      { transform: 'scale(1)' }
+    ], { duration: 300, easing: 'ease-out' });
+  }
+}
+
+/**
+ * Show toast notification for cart actions
+ */
+function showCartToast(productName, message, type = 'success') {
+  const existing = document.getElementById('cart-toast');
+  if (existing) existing.remove();
+
+  const toast = document.createElement('div');
+  toast.id = 'cart-toast';
+  toast.className = `cart-toast ${type}`;
+  toast.style.cssText = `
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: ${type === 'success' ? 'var(--success)' : '#ef4444'};
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    animation: slideInRight 0.3s ease;
+    max-width: 320px;
+  `;
+  
+  const icon = type === 'success' 
+    ? `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`
+    : `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>`;
+  
+  toast.innerHTML = `${icon}<span><strong>${escapeHtml(productName)}</strong><br>${message}</span>`;
+  document.body.appendChild(toast);
+
+  setTimeout(() => {
+    toast.style.animation = 'slideOutRight 0.3s ease forwards';
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
+/**
+ * Escape HTML to prevent XSS
+ */
+function escapeHtml(text) {
+  if (!text) return '';
+  const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+  return String(text).replace(/[&<>"']/g, m => map[m]);
+}
+
+/**
+ * ✅ CRITICAL: Initialize cart event delegation
+ * This is what makes the buttons clickable!
+ */
+function initCart() {
+  console.log('🛒 initCart() called'); // Debug log
+  
+  // Update cart count on load (for guest users)
+  if (!localStorage.getItem('jwtToken') && !sessionStorage.getItem('jwtToken')) {
+    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const count = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+    updateCartCount(count);
+  }
+
+  // ✅ Delegate click events for .add-to-cart buttons (works for dynamically loaded content)
+  document.addEventListener('click', (e) => {
+    const button = e.target.closest('.add-to-cart');
+    
+    if (!button) {
+      // console.log('❌ Click not on .add-to-cart'); // Uncomment for debugging
+      return;
+    }
+    
+    if (button.disabled) {
+      console.log('⚠️ Button disabled');
+      return;
+    }
+    
+    console.log('✅ Add to cart button clicked'); // Debug log
+    e.preventDefault();
+    
+    // Find product data from closest .product-card or .related-product-card
+    const card = button.closest('.product-card, .related-product-card');
+    if (!card) {
+      console.error('❌ Could not find product card');
+      return;
+    }
+
+    // Extract product data from data attributes (MOST RELIABLE)
+    const product = {
+      _id: card.dataset.productId,
+      title: card.dataset.productTitle || card.querySelector('.product-title')?.textContent?.trim(),
+      price: parseFloat(card.dataset.productPrice) || parseFloat(card.querySelector('.product-price')?.textContent?.replace('$', '')) || 0,
+      images: [card.dataset.productImage || card.querySelector('.product-image')?.src].filter(Boolean),
+      quantity: parseInt(card.dataset.productQuantity) || 1,
+      brand: card.dataset.productBrand,
+      color: card.dataset.productColor
+    };
+
+    console.log('📦 Extracted product:', product); // Debug log
+
+    if (!product._id || !product.title) {
+      console.error('❌ Missing product data', { card, product });
+      showCartToast('Error', 'Could not add product', 'error');
+      return;
+    }
+
+    // Call global addToCart function
+    addToCart(product, button);
+  });
+}
+
+// ✅ Initialize cart when DOM is ready - THIS IS CRITICAL!
+document.addEventListener('DOMContentLoaded', () => {
+  console.log('📄 DOMContentLoaded - initializing cart');
+  initCart();
+  
+  // Also handle pending cart action if on login page
+  if (window.location.pathname === '/user/login') {
+    handlePendingCartAction();
+  }
+});
+
+// Add toast animations to document head
+if (!document.getElementById('cart-toast-styles')) {
+  const style = document.createElement('style');
+  style.id = 'cart-toast-styles';
+  style.textContent = `
+    @keyframes slideInRight {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes slideOutRight {
+      from { transform: translateX(0); opacity: 1; }
+      to { transform: translateX(100%); opacity: 0; }
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+// END OF CART
+// =======================================

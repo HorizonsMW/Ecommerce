@@ -1,0 +1,107 @@
+<section class="cart-page">
+    <div class="container">
+        <!-- Page Header -->
+        <div class="cart-header">
+            <h1 class="section-title">Your Cart</h1>
+            <p class="section-subtitle">Review your items before checkout</p>
+        </div>
+
+        <!-- Cart Messages -->
+        <div id="cartMessage" class="message-box" style="display: none;"></div>
+
+        <!-- Empty Cart State -->
+        <div id="emptyCart" class="empty-cart" style="display: none;">
+            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin: 0 auto 1.5rem; opacity: 0.5;">
+                <circle cx="9" cy="21" r="1"></circle>
+                <circle cx="20" cy="21" r="1"></circle>
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+            </svg>
+            <h3>Your cart is empty</h3>
+            <p>Looks like you haven't added any items yet.</p>
+            <a href="/products" class="cta-button" style="margin-top: 1.5rem;">
+                Continue Shopping
+            </a>
+        </div>
+
+        <!-- Cart Content (Hidden when empty) -->
+        <div id="cartContent" style="display: none;">
+            <div class="cart-layout">
+                <!-- Cart Items -->
+                <div class="cart-items">
+                    <div class="cart-items-header">
+                        <span>Product</span>
+                        <span>Price</span>
+                        <span>Quantity</span>
+                        <span>Total</span>
+                        <span></span>
+                    </div>
+                    <div id="cartItemsList">
+                        <!-- Cart items rendered by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Cart Summary -->
+                <div class="cart-summary">
+                    <h3>Order Summary</h3>
+                    
+                    <div class="summary-row">
+                        <span>Subtotal</span>
+                        <span id="subtotalAmount">$0.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Shipping</span>
+                        <span id="shippingAmount">Calculated at checkout</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Tax</span>
+                        <span id="taxAmount">Calculated at checkout</span>
+                    </div>
+                    
+                    <div class="summary-total">
+                        <span>Total</span>
+                        <span id="totalAmount">$0.00</span>
+                    </div>
+                    
+                    <button id="checkoutBtn" class="cta-button" style="width: 100%; margin-top: 1.5rem;">
+                        Proceed to Checkout
+                    </button>
+                    
+                    <p class="text-secondary" style="font-size: 0.85rem; margin-top: 1rem; text-align: center;">
+                        🔒 Secure checkout • Free returns
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Cart Item Template (Hidden) -->
+<template id="cartItemTemplate">
+    <div class="cart-item" data-product-id="">
+        <div class="cart-item-image">
+            <img src="" alt="" class="cart-item-img">
+        </div>
+        <div class="cart-item-details">
+            <h4 class="cart-item-title"></h4>
+            <div class="cart-item-meta">
+                <span class="cart-item-brand"></span>
+                <span class="cart-item-color"></span>
+            </div>
+        </div>
+        <div class="cart-item-price"></div>
+        <div class="cart-item-quantity">
+            <button class="quantity-btn decrease" aria-label="Decrease quantity">−</button>
+            <input type="number" class="quantity-input" min="1" value="1" aria-label="Quantity">
+            <button class="quantity-btn increase" aria-label="Increase quantity">+</button>
+        </div>
+        <div class="cart-item-total"></div>
+        <button class="cart-item-remove" aria-label="Remove item">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 6L6 18M6 6l12 12"></path>
+            </svg>
+        </button>
+    </div>
+</template>
+
+<script src="/js/main.js"></script>
+<script src="/js/cart.js"></script>

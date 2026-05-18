@@ -46,6 +46,7 @@ const loginUserCtrl = asyncHandler(async (req, res) => {
 
 const accessToken = generateToken(findUser._id); // Your existing JWT generation
 
+
 // 🍪 Set httpOnly cookie for SSR page protection
 res.cookie('token', accessToken, {
   httpOnly: true,              // ❌ JavaScript can't access (XSS protection)
@@ -74,6 +75,7 @@ res.cookie('token', accessToken, {
       email: findUser.email,
       mobile: findUser.mobile,
       token: accessToken,
+      redirect: req.query.redirect || '/user/profile',//API clients to also get the redirect URL (for SPA frontends):
     });
   } else {
     //res.send("Invalid credentials");//this is an alternative sub for issue updated* err?message thing in errorHandler -- solved
