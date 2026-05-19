@@ -692,7 +692,7 @@ async function addToCart(product, button = null) {
     }
     
     // ✅ Logged in: Proceed with API call
-    const response = await fetch('/api/cart/add', {
+    const response = await fetch('/cart/add', {  // ← Changed from /api/cart/add
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -910,6 +910,53 @@ if (!document.getElementById('cart-toast-styles')) {
   `;
   document.head.appendChild(style);
 }
+
+
+// Fetch and update cart count for logged-in users
+async function updateHeaderCartCount() {
+  const token = localStorage.getItem('jwtToken') || sessionStorage.getItem('jwtToken');
+  const badge = document.getElementById('header-cart-count');
+  
+  if (!badge || !token) {
+    // Guest: count from localStorage
+    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const count = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+    if (badge) {
+      badge.textContent = count;
+      badge.style.display = count > 0 ? 'flex' : 'none';
+    }
+    return;
+  }
+  
+  try {
+    // ✅ Fetch from /cart/items (not /cart/cart)
+    const response = await fetch('/cart/items', {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      credentials: 'include'
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      const count = data.items?.reduce((sum, item) => sum + (item.quantity || 1), 0) || 0;
+      
+      if (badge) {
+        badge.textContent = count;
+        badge.style.display = count > 0 ? 'flex' : 'none';
+      }
+    }
+  } catch (error) {
+    console.warn('Could not fetch cart count:', error);
+  }
+}
+
+// Update on page load
+document.addEventListener('DOMContentLoaded', updateHeaderCartCount);
+
+// Make available globally for cart.js to call after updates
+window.updateHeaderCartCount = updateHeaderCartCount;
 
 // END OF CART
 // =======================================

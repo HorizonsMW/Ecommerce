@@ -29,12 +29,27 @@ NOTE: Only section comments added - no property values modified
   box-sizing: border-box;
   font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
 }
-
+/*
 body {
   background: 
     radial-gradient(ellipse at top, rgba(0, 102, 255, 0.15) 0%, transparent 50%),
     radial-gradient(ellipse at bottom right, rgba(47, 212, 113, 0.1) 0%, transparent 50%),
     linear-gradient(135deg, #0f0f0f 0%, #1a1a2e 50%, #16213e 100%);
+  background-attachment: fixed;
+  color: var(--text-primary);
+  line-height: 1.6;
+  min-height: 100vh;
+  padding: 10px;
+  overflow-x: hidden;
+}*/
+body {
+    background: 
+      /* Icy pastel cyan glow */
+      radial-gradient(ellipse at top, rgba(152, 226, 244, 0.15) 0%, transparent 50%),
+      /* Soft pale lilac glow */
+      radial-gradient(ellipse at bottom right, rgba(215, 184, 255, 0.12) 0%, transparent 50%),
+      /* Dusty steel blue to dark slate base */
+      linear-gradient(135deg, #171a21 0%, #1f2735 50%, #283545 100%);
   background-attachment: fixed;
   color: var(--text-primary);
   line-height: 1.6;

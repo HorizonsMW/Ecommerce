@@ -3,16 +3,22 @@
 // Handles backend cart structure: { items: [...], cartTotal }
 // ========================================
 
+// ========================================
+// CART FUNCTIONALITY - cart.js (FIXED for /cart routes)
+// ========================================
+
 class CartManager {
   constructor() {
     this.storageKey = 'cart';
-    this.apiBase = `/api/cart`;
+    this.apiBase = `/cart`; // ✅ Fixed: was '/api/cart'
     this.token = localStorage.getItem('jwtToken') || sessionStorage.getItem('jwtToken');
     this.items = [];
     this.cartTotal = 0;
   }
 
   async init() {
+    console.log('🛒 CartManager.init() - token:', !!this.token);
+    
     if (this.token) {
       await this.fetchFromAPI();
     } else {
@@ -32,7 +38,7 @@ class CartManager {
         addedAt: item.addedAt || new Date().toISOString()
       }));
       this.cartTotal = this.items.reduce((sum, item) => 
-        sum + (item.price * item.quantity), 0);
+        sum + ((item.price || 0) * (item.quantity || 1)), 0);
     } catch (e) {
       console.error('Error loading cart from localStorage:', e);
       this.items = [];
@@ -41,94 +47,60 @@ class CartManager {
   }
 
   /**
-   * ✅ FIXED: Fetch cart from API - handles { items, cartTotal } structure
-   */
-  async fetchFromAPI() {
-    try {
-      const response = await fetch(`${this.apiBase}`, {
-        headers: {
-          'Authorization': `Bearer ${this.token}`,
-          'Content-Type': 'application/json'
-        },
-        credentials: 'include'
-      });
-
-      if (!response.ok) throw new Error('Failed to fetch cart');
-      
-      const data = await response.json();
-      console.log('📦 API cart response:', data); // Debug log
-      
-      // ✅ Handle backend structure: { items: [...], cartTotal, _id }
-      if (data?.items && Array.isArray(data.items)) {
-        this.items = data.items.map(item => ({
-          // Cart item fields
-          cartItemId: item._id, // The cart entry's own ID
-          productId: item.productId?.$oid || item.productId, // Handle ObjectId
-          quantity: item.quantity || 1,
-          price: item.price || 0,
-          title: item.title || 'Unknown Product',
-          // Optional: fetch image if not included
-          image: item.image || null,
-          brand: item.brand || '',
-          color: item.color || ''
-        }));
-        this.cartTotal = data.cartTotal || this.calculateSubtotal();
+     * Fetch cart from API at /cart/items
+     */
+    async fetchFromAPI() {
+      try {
+        console.log('📡 Fetching cart from:', `${this.apiBase}/items`);
         
-        // ✅ If items don't have images, fetch them in batch
-        const itemsWithoutImages = this.items.filter(i => !i.image);
-        if (itemsWithoutImages.length > 0) {
-          await this.fetchProductImages(itemsWithoutImages);
+        const response = await fetch(`${this.apiBase}/items`, { // ✅ Changed from /cart/cart to /cart/items
+          headers: {
+            'Authorization': `Bearer ${this.token}`,
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include'
+        });
+  
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('❌ API error:', response.status, errorText);
+          throw new Error(`HTTP ${response.status}: ${errorText}`);
         }
-      } else if (Array.isArray(data)) {
-        // Fallback: direct array response
-        this.items = data;
-        this.cartTotal = this.calculateSubtotal();
-      } else {
-        this.items = [];
-        this.cartTotal = 0;
+        
+        const data = await response.json();
+        console.log('📦 API cart response:', data);
+        
+        if (data?.items && Array.isArray(data.items)) {
+          this.items = data.items.map(item => ({
+            cartItemId: item._id,
+            productId: item.productId, // Already clean string from backend
+            quantity: item.quantity || 1,
+            price: item.price || 0,
+            title: item.title || 'Unknown Product',
+            image: item.image || null,
+            brand: item.brand || '',
+            color: item.color || '',
+            availableStock: item.availableStock || 999
+          }));
+          
+          this.cartTotal = data.cartTotal || this.calculateSubtotal();
+          console.log('✅ Loaded', this.items.length, 'items from API');
+          
+        } else {
+          console.warn('⚠️ Unexpected API response format:', data);
+          this.items = [];
+          this.cartTotal = 0;
+        }
+        
+      } catch (error) {
+        console.error('Error fetching cart from API:', error);
+        this.loadFromLocalStorage();
       }
-      
-    } catch (error) {
-      console.error('Error fetching cart from API:', error);
-      this.loadFromLocalStorage();
     }
-  }
-
-  /**
-   * Fetch product images for items that don't have them
-   */
-  async fetchProductImages(items) {
-    try {
-      const imageMap = {};
-      
-      await Promise.all(
-        items.map(async (item) => {
-          try {
-            const res = await fetch(`/api/products/${item.productId}`);
-            if (res.ok) {
-              const product = await res.json();
-              imageMap[item.productId] = product.images?.[0] || null;
-            }
-          } catch (err) {
-            console.warn(`Could not fetch image for ${item.productId}:`, err);
-          }
-        })
-      );
-      
-      // Update items with fetched images
-      this.items = this.items.map(item => ({
-        ...item,
-        image: imageMap[item.productId] || item.image
-      }));
-      
-    } catch (error) {
-      console.error('Error fetching product images:', error);
-    }
-  }
 
   calculateSubtotal() {
     return this.items.reduce((sum, item) => 
-      sum + (item.price * item.quantity), 0);
+      sum + ((item.price || 0) * (item.quantity || 1)), 0);
   }
 
   async save() {
@@ -158,9 +130,7 @@ class CartManager {
   }
 
   async add(product, quantity = 1) {
-    const existing = this.items.find(item => 
-      (item.productId?.$oid || item.productId) === product._id
-    );
+    const existing = this.items.find(item => item.productId === product._id);
     
     if (existing) {
       existing.quantity += quantity;
@@ -184,21 +154,79 @@ class CartManager {
   async updateQuantity(productId, quantity) {
     if (quantity < 1) return this.remove(productId);
     
-    const item = this.items.find(item => 
-      (item.productId?.$oid || item.productId) === productId
-    );
+    const item = this.items.find(item => item.productId === productId);
     if (item) {
       item.quantity = quantity;
-      await this.save();
+      
+      // ✅ Only sync with API if user is logged in
+      if (this.token) {
+        await this._syncQuantityWithAPI(productId, quantity);
+      }
+      
+      // Always update localStorage for guest fallback
+      localStorage.setItem(this.storageKey, JSON.stringify(this.items));
     }
     return this.items;
   }
+  
+  /**
+   * ✅ Sync single item quantity with backend at /cart/update
+   */
+  async _syncQuantityWithAPI(productId, quantity) {
+    try {
+      const response = await fetch(`${this.apiBase}/update`, { // ✅ /cart/update
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.token}`,
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify({ 
+          productId: productId, 
+          quantity: quantity 
+        })
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to update quantity');
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Error syncing quantity with API:', error);
+      throw error;
+    }
+  }
 
   async remove(productId) {
-    this.items = this.items.filter(item => 
-      (item.productId?.$oid || item.productId) !== productId
-    );
-    await this.save();
+    console.log('🗑️ Removing from cart:', productId);
+    
+    // Remove from local state first
+    this.items = this.items.filter(item => item.productId !== productId);
+    
+    // Sync with backend if logged in
+    if (this.token) {
+      try {
+        await fetch(`${this.apiBase}/${productId}`, { // ✅ DELETE /cart/:productId
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${this.token}`,
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include'
+        });
+      } catch (error) {
+        console.error('Error removing from API:', error);
+        // Revert local change if API fails
+        // (optional: you could re-fetch cart here)
+      }
+    } else {
+      // Guest: save to localStorage
+      localStorage.setItem(this.storageKey, JSON.stringify(this.items));
+    }
+    
+    await this.save(); // This will re-render
     return this.items;
   }
 
@@ -221,11 +249,8 @@ class CartManager {
     };
   }
 
-  /**
-   * ✅ FIXED: Render cart with proper data mapping
-   */
   render() {
-    console.log('🛒 Rendering cart with items:', this.items);
+    console.log('🛒 Rendering cart with', this.items.length, 'items');
     
     const list = document.getElementById('cartItemsList');
     const emptyCart = document.getElementById('emptyCart');
@@ -238,21 +263,19 @@ class CartManager {
     }
     
     if (this.items.length === 0) {
-      console.log('📭 Cart is empty');
       if (emptyCart) emptyCart.style.display = 'block';
       if (cartContent) cartContent.style.display = 'none';
       return;
     }
     
-    console.log('✅ Cart has items, rendering...');
     if (emptyCart) emptyCart.style.display = 'none';
     if (cartContent) cartContent.style.display = 'block';
     
     list.innerHTML = '';
     
     this.items.forEach((item, index) => {
-      // Handle both string and ObjectId productId
-      const productId = item.productId?.$oid || item.productId;
+      // ✅ productId is already a clean string from fetchFromAPI
+      const productId = item.productId;
       
       console.log(`📦 Rendering item ${index + 1}:`, { 
         id: productId, 
@@ -264,10 +287,10 @@ class CartManager {
       const clone = template.content.cloneNode(true);
       const cartItem = clone.querySelector('.cart-item');
       
-      // Set data attribute with string ID for event handling
+      // ✅ Set clean string ID
       cartItem.dataset.productId = productId;
       
-      // Safe DOM updates with fallbacks
+      // Safe DOM updates
       const imgEl = clone.querySelector('.cart-item-img');
       if (imgEl) {
         imgEl.src = item.image || '/images/placeholder.jpg';
@@ -321,12 +344,14 @@ class CartManager {
 
   updateCartCount() {
     const count = this.items.reduce((sum, item) => sum + (item.quantity || 1), 0);
-    const cartCountEl = document.querySelector('.cart-count');
     
+    // ✅ Update header badge
+    const cartCountEl = document.querySelector('#header-cart-count');
     if (cartCountEl) {
       cartCountEl.textContent = count;
       cartCountEl.style.display = count > 0 ? 'flex' : 'none';
       
+      // Animate
       cartCountEl.animate([
         { transform: 'scale(1)' },
         { transform: 'scale(1.3)' },
@@ -346,31 +371,46 @@ class CartManager {
       if (!cartItem) return;
       
       const productId = cartItem.dataset.productId;
+      console.log('🖱️ Cart item click:', { productId, target: e.target.className });
       
+      // ✅ Handle Remove button
       if (e.target.closest('.cart-item-remove')) {
+        console.log('🗑️ Remove clicked for:', productId);
         await this.remove(productId);
         showCartToast('Item removed from cart', 'success');
         return;
       }
       
+      // ✅ Handle Quantity buttons
       const input = cartItem.querySelector('.quantity-input');
       if (!input) return;
       
-      let quantity = parseInt(input.value) || 1;
+      const increaseBtn = e.target.closest('.quantity-btn.increase');
+      const decreaseBtn = e.target.closest('.quantity-btn.decrease');
       
-      if (e.target.closest('.quantity-btn.increase')) {
-        quantity += 1;
-      } else if (e.target.closest('.quantity-btn.decrease') && quantity > 1) {
-        quantity -= 1;
+      if (increaseBtn) {
+        e.preventDefault();
+        console.log('⬆️ Increase clicked for:', productId);
+        await increaseQuantity(productId, increaseBtn);
+        return;
       }
+      
+      if (decreaseBtn) {
+        e.preventDefault();
+        console.log('⬇️ Decrease clicked for:', productId);
+        await decreaseQuantity(productId, decreaseBtn);
+        return;
+      }
+      
+      // Fallback: manual input change
+      let quantity = parseInt(input.value) || 1;
+      if (quantity < 1) quantity = 1;
       
       input.value = quantity;
       await this.updateQuantity(productId, quantity);
       
-      // Update displayed total for this item
-      const item = this.items.find(i => 
-        (i.productId?.$oid || i.productId) === productId
-      );
+      // Update displayed total
+      const item = this.items.find(i => i.productId === productId);
       if (item) {
         const totalEl = cartItem.querySelector('.cart-item-total');
         if (totalEl) {
@@ -398,10 +438,177 @@ document.addEventListener('DOMContentLoaded', async () => {
   window.cartManager = cart;
 });
 
-// Integration with global addToCart from main.js
+// ========================================
+// GLOBAL CART FUNCTIONS (for use from main.js)
+// ========================================
+
+/**
+ * Increase item quantity - uses /cart/add endpoint
+ */
+async function increaseQuantity(productId, button = null) {
+  console.log('⬆️ increaseQuantity:', { productId, type: typeof productId });
+  
+  // Ensure clean string ID
+  const cleanProductId = typeof productId === 'string' && productId.length === 24
+    ? productId
+    : (productId?.$oid || productId?._id || productId);
+  
+  if (!cleanProductId || typeof cleanProductId !== 'string') {
+    showCartToast('Error', 'Invalid product ID', 'error');
+    return;
+  }
+  
+  if (button) {
+    button.disabled = true;
+    button.innerHTML = '<span class="btn-loader">...</span>';
+  }
+
+  try {
+    const token = localStorage.getItem('jwtToken') || sessionStorage.getItem('jwtToken');
+    
+    if (!token) {
+      // Guest mode
+      const cartItems = JSON.parse(localStorage.getItem('cart') || '[]');
+      const item = cartItems.find(i => i.productId === cleanProductId);
+      if (item) {
+        item.quantity = (item.quantity || 1) + 1;
+        localStorage.setItem('cart', JSON.stringify(cartItems));
+        if (window.cartManager) {
+          window.cartManager.loadFromLocalStorage();
+          window.cartManager.render();
+          window.cartManager.updateCartCount();
+        }
+        showCartToast('Quantity updated', 'success');
+      }
+      return;
+    }
+    
+    // ✅ Logged in: Call /cart/add with quantity: 1
+    const response = await fetch('/cart/add', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ productId: cleanProductId, quantity: 1 }),
+      credentials: 'include'
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to update quantity');
+    }
+
+    const result = await response.json();
+    
+    if (window.cartManager) {
+      await window.cartManager.fetchFromAPI();
+      window.cartManager.render();
+      window.cartManager.updateCartCount();
+    }
+    
+    showCartToast('Quantity updated', 'success');
+
+  } catch (error) {
+    console.error('Increase error:', error);
+    showCartToast(error.message || 'Failed to update', 'error');
+  } finally {
+    if (button) {
+      button.disabled = false;
+      button.innerHTML = '+';
+    }
+  }
+}
+
+/**
+ * Decrease item quantity - uses /cart/update endpoint
+ */
+async function decreaseQuantity(productId, button = null) {
+  console.log('⬇️ decreaseQuantity:', { productId });
+  
+  const cleanProductId = typeof productId === 'string' && productId.length === 24
+    ? productId
+    : (productId?.$oid || productId?._id || productId);
+  
+  if (!cleanProductId) {
+    showCartToast('Error', 'Invalid product ID', 'error');
+    return;
+  }
+  
+  if (button) button.disabled = true;
+
+  try {
+    const token = localStorage.getItem('jwtToken') || sessionStorage.getItem('jwtToken');
+    
+    if (!token) {
+      // Guest mode
+      const cartItems = JSON.parse(localStorage.getItem('cart') || '[]');
+      const idx = cartItems.findIndex(i => i.productId === cleanProductId);
+      if (idx !== -1) {
+        if (cartItems[idx].quantity > 1) {
+          cartItems[idx].quantity -= 1;
+        } else {
+          cartItems.splice(idx, 1);
+        }
+        localStorage.setItem('cart', JSON.stringify(cartItems));
+        if (window.cartManager) {
+          window.cartManager.loadFromLocalStorage();
+          window.cartManager.render();
+          window.cartManager.updateCartCount();
+        }
+        showCartToast('Quantity updated', 'success');
+      }
+      return;
+    }
+    
+    // ✅ Logged in: Use CartManager.updateQuantity which calls /cart/update
+    if (window.cartManager) {
+      const item = window.cartManager.items.find(i => i.productId === cleanProductId);
+      if (!item) return;
+      
+      const newQty = Math.max(0, (item.quantity || 1) - 1);
+      
+      if (newQty === 0) {
+        await window.cartManager.remove(cleanProductId);
+        showCartToast('Item removed', 'success');
+      } else {
+        // ✅ Call /cart/update endpoint
+        const response = await fetch('/cart/update', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ productId: cleanProductId, quantity: newQty }),
+          credentials: 'include'
+        });
+        
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || 'Failed to update');
+        }
+        
+        await window.cartManager.fetchFromAPI();
+        window.cartManager.render();
+        window.cartManager.updateCartCount();
+        showCartToast('Quantity updated', 'success');
+      }
+    }
+
+  } catch (error) {
+    console.error('Decrease error:', error);
+    showCartToast(error.message || 'Failed to update', 'error');
+  } finally {
+    if (button) button.disabled = false;
+  }
+}
+
+/**
+ * Integration with global addToCart from main.js
+ */
 async function updateCartFromGlobal(product, quantity = 1) {
   if (!cart) {
-    // Guest mode: use localStorage
+    // Guest mode
     const cartItems = JSON.parse(localStorage.getItem('cart') || '[]');
     const existing = cartItems.find(item => item.productId === product._id);
     
@@ -418,9 +625,8 @@ async function updateCartFromGlobal(product, quantity = 1) {
     }
     
     localStorage.setItem('cart', JSON.stringify(cartItems));
-    
     const count = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-    const cartCountEl = document.querySelector('.cart-count');
+    const cartCountEl = document.querySelector('#header-cart-count');
     if (cartCountEl) {
       cartCountEl.textContent = count;
       cartCountEl.style.display = count > 0 ? 'flex' : 'none';
@@ -428,11 +634,10 @@ async function updateCartFromGlobal(product, quantity = 1) {
     return;
   }
   
-  // Logged in: use CartManager
   await cart.add(product, quantity);
 }
 
-// Toast notifications
+// Toast notifications (same as main.js)
 function showCartToast(message, type = 'success') {
   const existing = document.getElementById('cart-toast');
   if (existing) existing.remove();

@@ -86,6 +86,8 @@ app.use("/api/products", productRouter);
 app.use("/api/cart", cartRouter);
 
 
+
+
 // index.js modifications for web ///
 //duplicate of development routes - testing GUI Routes
 // Removed "api" from the path, duplicated all Routes in the APIs' folder into the Web folder
@@ -99,6 +101,8 @@ app.use("/user", webAuthRouter);
 app.use("/cart", webCartRouter);
 app.use("/product", webProductRouter);
 app.use("/categories", webCategoriesRouter);
+//app.use("/api/cart", webCartRouter);
+
 // index.js modifications for web ///
 
 
