@@ -38,6 +38,7 @@ const authMiddleware = asyncHandler(async (req, res, next) => {
   else if (req.cookies?.token) {
     token = req.cookies.token;
   }
+
   // ❌ No token found in either location
   if (!token) {
     return res.status(401).json({ message: 'There is no token attached to the header or cookie' });
@@ -87,75 +88,24 @@ const isLoggedIn = (req, res, next) => {
 
 // middlewares/authMiddleware.js
 const isLoggedIn = asyncHandler(async (req, res, next) => {
-  let token;
-  
-  // Check Authorization header first (for API clients)
-  if (req.headers.authorization?.startsWith('Bearer')) {
-    token = req.headers.authorization.split(' ')[1];
-  }
-  // Fallback to cookie (for browser/SSR)
-  else if (req.cookies?.token) {
-    token = req.cookies.token;
-  }
-  
-  // No token found
-  if (!token) {
-    // API request → return JSON error
-  
-    if (req.path.startsWith('/api/') || req.headers['accept']?.includes('application/json')) {
-      return res.status(401).json({ message: "Authentication required: No token provided" });
+    let token;
+    
+    // Check Authorization header first (for API clients)
+    if (req.headers.authorization?.startsWith('Bearer')) {
+        token = req.headers.authorization.split(' ')[1];
     }
-    // Web page request → redirect to login
+    // Fallback to cookie (for browser/SSR)
+    else if (req.cookies?.token) {
+        token = req.cookies.token;
+    }
+    
+    if (!token) {
+        return res.status(401).json({ message: "There is no token attached to the header or cookie" });
+    }
 
-    const returnTo = req.originalUrl; // Save where they wanted to go
-    return res.redirect(`/user/login?returnTo=${encodeURIComponent(returnTo)}`);
-    //return res.redirect('/user/login');
-  }
-
-  try {
-    // Verify and decode token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    
-    // Find user and attach to request (exclude sensitive fields)
-    const user = await User.findById(decoded.id).select('-password -refreshToken');
-    
-    if (!user) {
-      // User not found → invalid token
-      if (req.path.startsWith('/api/') || req.headers['accept']?.includes('application/json')) {
-        return res.status(401).json({ message: "Invalid token: User not found" });
-      }
-      
-      const returnTo = req.originalUrl; // Save where they wanted to go
-
-      const allowedReturns = ['/user/profile', '/products', '/'];
-      const redirectUrl = allowedReturns.includes(req.query.returnTo) ? req.query.returnTo : '/user/profile';
-      return res.redirect(`/user/login?returnTo=${encodeURIComponent(redirectUrl)}`);
-      //return res.redirect('/user/login');
-    }
-    
-    // ✅ User authenticated → attach to request and proceed
-    req.user = user;
+    req.user = await User.findById(decoded.id).select('-password');
     next();
-    
-  } catch (error) {
-    console.error('Auth middleware error:', error.name, error.message);
-    
-    // Token expired/invalid
-    if (req.path.startsWith('/api/') || req.headers['accept']?.includes('application/json')) {
-      return res.status(401).json({ 
-        message: "Authentication failed: Token expired or invalid",
-        error: process.env.NODE_ENV === 'development' ? error.message : undefined
-      });
-    }
-    
-    // Clear invalid cookie and redirect
-    res.clearCookie('token', { 
-      httpOnly: true, 
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax'
-    });
-    return res.redirect('/user/login?message=Session+expired+-+please+login+again');
-  }
 });
 
 module.exports = {

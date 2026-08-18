@@ -1,305 +1,151 @@
 <section class="login-section">
-    <div class="container">
-        <div class="login-wrapper">
-            <h2 class="section-title">Welcome Back</h2>
-            <p class="section-subtitle">Sign in to continue to your account</p>
+  <div class="container">
+    <h2 class="section-title">Welcome Back</h2>
+    <p class="section-subtitle">Sign in to continue to your account</p>
 
-            <!-- Error message container -->
-            <div id="errorMessage" class="error-message" style="display: none;"></div>
+    <!-- Error message container -->
+    <div id="errorMessage" class="error-message" style="display: none"></div>
 
-            <!-- Success message -->
-            <div id="successMessage" class="success-message" style="display: none;">
-                Login successful! Redirecting...
-            </div>
-
-            <form id="loginForm" class="login-form">
-                <!-- Email Field -->
-                <div class="form-group">
-                    <label for="email" class="form-label">Email Address</label>
-                    <input 
-                        type="email" 
-                        id="email" 
-                        name="email" 
-                        class="input-field" 
-                        required 
-                        placeholder="you@example.com"
-                        autocomplete="email"
-                    >
-                </div>
-
-                <!-- Password Field with Toggle -->
-                <div class="form-group">
-                    <label for="password" class="form-label">Password</label>
-                    <div class="password-wrapper">
-                        <input 
-                            type="password" 
-                            id="password" 
-                            name="password" 
-                            class="input-field" 
-                            required 
-                            placeholder="••••••••"
-                            autocomplete="current-password"
-                        >
-                        <button 
-                            type="button" 
-                            class="toggle-password" 
-                            id="togglePassword"
-                            aria-label="Toggle password visibility"
-                        >
-                            👁️
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Remember Me & Forgot Password -->
-                <div class="form-options">
-                    <label class="remember-me">
-                        <input type="checkbox" id="rememberMe">
-                        <span>Remember me</span>
-                    </label>
-                    <a href="/user/forgot-password" class="forgot-link">Forgot password?</a>
-                </div>
-
-                <!-- Submit Button -->
-                <button type="submit" class="cta-button" id="submitBtn">
-                    <span class="btn-text">Sign In</span>
-                    <span class="btn-loader" style="display: none;">Logging in...</span>
-                </button>
-            </form>
-
-            <!-- Divider -->
-            <div class="form-divider">
-                <span>or</span>
-            </div>
-
-            <!-- Register Link -->
-            <p class="form-footer">
-                Don't have an account? 
-                <a href="/user/register" class="link-primary">Create one</a>
-            </p>
-        </div>
+    <!-- Success message (for future use) -->
+    <div id="successMessage" class="success-message" style="display: none">
+      Login successful! Redirecting...
     </div>
+
+    <form id="loginForm" class="login-form">
+      <div class="form-group">
+        <label for="email" class="form-label">Email Address</label>
+        <input type="email" id="email" name="email" class="input-field" required placeholder="you@example.com"
+          autocomplete="email" />
+      </div>
+
+      <div class="form-group">
+        <label for="password" class="form-label">Password</label>
+        <div class="password-wrapper">
+          <input type="password" id="password" name="password" class="input-field" required placeholder="••••••••"
+            autocomplete="current-password" />
+          <button type="button" class="toggle-password" id="togglePassword"
+            aria-label="Toggle password visibility"><span>Show</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="form-options">
+        <label class="remember-me">
+          <input type="checkbox" id="rememberMe" />
+          <span>Remember me</span>
+        </label>
+        <a href="/user/forgot-password" class="forgot-link">Forgot password?</a>
+      </div>
+
+      <button type="submit" class="cta-button" id="submitBtn">
+        <span class="btn-text">Sign In</span>
+        <span class="btn-loader" style="display: none">Logging in...</span>
+      </button>
+    </form>
+
+    <div class="form-divider">
+      <span>or</span>
+    </div>
+
+    <p class="form-footer">
+      Don't have an account?
+      <a href="/user/register" class="link-primary">Create one</a>
+    </p>
+  </div>
 </section>
 
-<style>
-/* Login-specific styles to ensure proper centering */
-.login-section {
-    min-height: calc(100vh - 200px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 3rem 1rem;
-}
-
-.login-wrapper {
-    width: 100%;
-    max-width: 480px;
-    margin: 0 auto;
-}
-
-.login-section .section-title {
-    text-align: center;
-    margin-bottom: 0.5rem;
-}
-
-.login-section .section-subtitle {
-    text-align: center;
-    margin-bottom: 2rem;
-}
-
-/* Ensure password wrapper is relative */
-.password-wrapper {
-    position: relative;
-    width: 100%;
-}
-
-/* Password input takes full width */
-.password-wrapper .input-field {
-    width: 100%;
-    padding-right: 3rem; /* Space for toggle button */
-    margin-bottom: 0;
-}
-
-/* Toggle button positioned absolutely inside wrapper */
-.toggle-password {
-    position: absolute;
-    right: 1rem;
-    top: 50%;
-    transform: translateY(-50%);
-    background: transparent;
-    border: none;
-    color: var(--text-secondary);
-    cursor: pointer;
-    font-size: 1.2rem;
-    padding: 0.25rem;
-    z-index: 10;
-    transition: color 0.2s;
-}
-
-.toggle-password:hover {
-    color: var(--accent-blue);
-}
-
-/* Form options - ensure proper spacing */
-.form-options {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-    gap: 1rem;
-}
-
-/* Responsive adjustments */
-@media (max-width: 480px) {
-    .login-section {
-        padding: 2rem 1rem;
-    }
-    
-    .form-options {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-}
-</style>
-
+<!-- JavaScript (Updated with your fixed token handling + modern UX) -->
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    // Password toggle functionality
-    const toggleBtn = document.getElementById("togglePassword");
-    const passwordInput = document.getElementById("password");
-    
-    if (toggleBtn && passwordInput) {
-        toggleBtn.addEventListener("click", function () {
-            const isPassword = passwordInput.type === "password";
-            passwordInput.type = isPassword ? "text" : "password";
-            this.textContent = isPassword ? "🙈" : "👁️";
-            this.setAttribute(
-                "aria-label",
-                isPassword ? "Hide password" : "Show password",
-            );
+  document
+    .getElementById("loginForm")
+    .addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const submitBtn = document.getElementById("submitBtn");
+      const btnText = submitBtn.querySelector(".btn-text");
+      const btnLoader = submitBtn.querySelector(".btn-loader");
+      const errorDiv = document.getElementById("errorMessage");
+      const successDiv = document.getElementById("successMessage");
+
+      // UI: Loading state
+      submitBtn.disabled = true;
+      btnText.style.display = "none";
+      btnLoader.style.display = "inline";
+      errorDiv.style.display = "none";
+      successDiv.style.display = "none";
+
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      const rememberMe = document.getElementById("rememberMe").checked;
+
+      // After (for testing) - log on LAN device fails if fetch is localhost, changing to API_BASE
+      const API_BASE = window.location.hostname === 'localhost'
+        ? 'http://localhost:5000/api'
+        : `http://${window.location.hostname}:5000/api`;
+
+      try {
+        const response = await fetch(`${API_BASE}/user/login`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({ email, password }),
+          credentials: "include", // 🍪 Send cookies for refreshToken
         });
-    }
 
-    // Login form handler
-    const loginForm = document.getElementById("loginForm");
-    if (!loginForm) return;
+        const data = await response.json();
+        //console.log("🔍 Login response:", data);//for debugging
 
-    loginForm.addEventListener("submit", async function (e) {
-        e.preventDefault();
-
-        const submitBtn = document.getElementById("submitBtn");
-        const btnText = submitBtn?.querySelector(".btn-text");
-        const btnLoader = submitBtn?.querySelector(".btn-loader");
-        const errorDiv = document.getElementById("errorMessage");
-        const successDiv = document.getElementById("successMessage");
-
-        // UI: Loading state
-        if (submitBtn) submitBtn.disabled = true;
-        if (btnText) btnText.style.display = "none";
-        if (btnLoader) btnLoader.style.display = "inline";
-        if (errorDiv) errorDiv.style.display = "none";
-        if (successDiv) successDiv.style.display = "none";
-
-        const email = document.getElementById("email")?.value.trim();
-        const password = document.getElementById("password")?.value;
-        
-        if (!email || !password) {
-            if (errorDiv) {
-                errorDiv.textContent = "Please enter both email and password";
-                errorDiv.style.display = "block";
-            }
-            if (submitBtn) submitBtn.disabled = false;
-            if (btnText) btnText.style.display = "inline";
-            if (btnLoader) btnLoader.style.display = "none";
-            return;
+        if (!response.ok) {
+          throw new Error(data.message || "Login failed");
         }
 
-        // Server runs on PORT 4000
-        const API_BASE = `http://${window.location.hostname}:4000/api`;
+        // Token is at root level (matching your backend)
+        // Inside login.ejs fetch success block:
+        if (data.token) {
+          // Optional: Still store in localStorage for API calls if needed
+          localStorage.setItem("jwtToken", data.token);
+          localStorage.setItem(
+            "user",
+            JSON.stringify({
+              _id: data._id,
+              firstname: data.firstname,
+              lastname: data.lastname,
+              email: data.email,
+              mobile: data.mobile,
+              isAdmin: data.isAdmin,
+            }),
+          );
 
-        try {
-            const response = await fetch(`${API_BASE}/user/login`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Accept": "application/json",
-                },
-                body: JSON.stringify({ email, password }),
-                credentials: "include",
-            });
-        
-            const contentType = response.headers.get("content-type");
-            if (!contentType?.includes("application/json")) {
-                const text = await response.text();
-                console.error("❌ Non-JSON response:", text.substring(0, 200));
-                throw new Error("Server configuration error");
-            }
-        
-            const data = await response.json();
-        
-            if (!response.ok) {
-                throw new Error(data.message || `Login failed: ${response.status}`);
-            }
-        
-            if (data.token) {
-                // Store based on "Remember me"
-                const storage = document.getElementById("rememberMe")?.checked 
-                    ? localStorage 
-                    : sessionStorage;
-                    
-                storage.setItem("jwtToken", data.token);
-                storage.setItem("user", JSON.stringify({
-                    _id: data._id,
-                    firstname: data.firstname,
-                    lastname: data.lastname,
-                    email: data.email,
-                    mobile: data.mobile,
-                    isAdmin: data.isAdmin,
-                }));
-        
-                if (successDiv) {
-                    successDiv.textContent = "Login successful! Redirecting...";
-                    successDiv.style.display = "block";
-                }
-
-                // ✅ Handle pending cart action if present
-                if (typeof handlePendingCartAction === 'function') {
-                  await handlePendingCartAction();
-                }
-                
-                // Redirect to intended page or default
-                const redirectUrl = new URLSearchParams(window.location.search).get('redirect') ||data.isAdmin ? "/admin/dashboard" : "/user/profile";
-                window.location.href = redirectUrl;
-        
-                //const redirectUrl = data.isAdmin ? "/admin/dashboard" : "/user/profile";
-                setTimeout(() => {
-                    window.location.href = redirectUrl;
-                }, 500);
-            } else {
-                throw new Error("Login succeeded but no token received");
-            }
-        
-        } catch (error) {
-            console.error("💥 Login error:", error.message);
-        
-            let userMessage = "Invalid email or password";
-            if (error.name === "TypeError" && error.message.includes("Failed to fetch")) {
-                userMessage = "Cannot connect to server. Is it running on port 4000?";
-            } else if (error.message.includes("CORS") || error.message.includes("NetworkError")) {
-                userMessage = "Connection blocked by browser security.";
-            } else if (error.message) {
-                userMessage = error.message;
-            }
-        
-            if (errorDiv) {
-                errorDiv.textContent = userMessage;
-                errorDiv.style.display = "block";
-            }
-            
-            if (submitBtn) submitBtn.disabled = false;
-            if (btnText) btnText.style.display = "inline";
-            if (btnLoader) btnLoader.style.display = "none";
+          // Redirect - browser will auto-send token cookie on next request!
+          const redirectUrl = data.isAdmin
+            ? "/admin/dashboard"
+            : "/user/profile";
+          window.location.href = redirectUrl;
         }
+      } catch (error) {
+        console.error("Login error:", error);
+        errorDiv.textContent = error.message || "Invalid email or password";
+        errorDiv.style.display = "block";
+        // Reset button
+        submitBtn.disabled = false;
+        btnText.style.display = "inline";
+        btnLoader.style.display = "none";
+      }
     });
-});
+  // Password visibility toggle
+  document
+    .getElementById("togglePassword")
+    ?.addEventListener("click", function () {
+      console.log("why is this button not working");
+      const passwordInput = document.getElementById("password");
+      const isPassword = passwordInput.type === "password";
+      passwordInput.type = isPassword ? "text" : "password";
+      this.textContent = isPassword ? "🙈" : "👁️";
+      this.setAttribute(
+        "aria-label",
+        isPassword ? "Hide password" : "Show password",
+      );
+    });
 </script>

@@ -4,16 +4,14 @@ const app = express();
 const dotenv = require('dotenv').config();
 const authRouter = require("./routes/APIs/authRoute");
 const productRouter = require("./routes/APIs/productRoute");
-const webCategoriesRouter = require("./routes/Web/webCategoriesRoute");
 const cartRouter = require("./routes/APIs/cartRoute");
 const bodyParser = require('body-parser');
 const { notFound, errorHandler } = require('./middlewares/errorHandler');
 const cookieParser = require("cookie-parser");
-const cors = require('cors'); // ← Import cors
 const morgan = require('morgan');
 const PORT = process.env.PORT || 4000;
 const expressLayouts = require('express-ejs-layouts'); // Import express-ejs-layouts
-
+app.use(cookieParser());
 
 
 
@@ -35,38 +33,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 dbConnect();
 
-// ✅ CORS Configuration - MUST be before routes
-app.use(cors({
-  origin: (origin, callback) => {
-    // Allow requests with no origin (mobile apps, curl, file://)
-    if (!origin) return callback(null, true);
-    
-    // Allow localhost variants and LAN IPs for development
-    const allowedOrigins = [
-      'http://localhost:5000',
-      'http://127.0.0.1:5000',
-      'http://localhost:4000', // If frontend runs on different port
-      'http://192.168.1.100:5000', // ← Replace with your LAN IP
-      'file://', // Allow local file access (dev only)
-    ];
-    
-    if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      console.warn(`🚫 CORS blocked origin: ${origin}`);
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true, // ✅ Allow cookies/auth headers to be sent
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
-}));
-
 app.use(morgan('combined'));//log activity on the console
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-
 app.use(cookieParser());
 
 //root -- remove for testing api
@@ -87,8 +57,6 @@ app.use("/api/products", productRouter);
 app.use("/api/cart", cartRouter);
 
 
-
-
 // index.js modifications for web ///
 //duplicate of development routes - testing GUI Routes
 // Removed "api" from the path, duplicated all Routes in the APIs' folder into the Web folder
@@ -101,9 +69,6 @@ app.use("/home", webProductRouter);
 app.use("/user", webAuthRouter);
 app.use("/cart", webCartRouter);
 app.use("/product", webProductRouter);
-app.use("/categories", webCategoriesRouter);
-//app.use("/api/cart", webCartRouter);
-
 // index.js modifications for web ///
 
 
