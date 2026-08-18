@@ -1,4 +1,4 @@
-<section class="featured-products" >
+<section class="featured-products">
     <div class="container">
         <div class="products-header">
             <div class="view-options">
@@ -61,84 +61,122 @@
         </div>
         <div class="products-layout">
             <!-- Filters Column - DYNAMIC (populated from filters object) -->
+            <div class="filters-overlay"></div>
+            <!-- Filters Column - with Accordion -->
             <div class="filters-column">
-                <!-- Categories (Dynamic) -->
-                <!-- Categories (Dynamic with Counts) -->
-                <div class="filter-section" data-filter="category">
-                    <h3>Categories</h3>
-                    <div class="filter-options">
-                        <% if (filters?.categories?.length) { %>
-                            <% filters.categories.forEach(category=> { %>
-                                <label class="filter-option">
-                                    <input type="checkbox" name="category" value="<%= category.name %>">
-                                    <%= category.name %>
-                                        <span class="text-secondary">(<%= category.count %>)</span>
-                                </label>
-                                <% }); %>
-                                    <% } else { %>
-                                        <span class="text-secondary">No categories available</span>
-                                        <% } %>
-                    </div>
-                </div>
 
-                <!-- Brands (Dynamic with Counts) -->
-                <div class="filter-section" data-filter="brand">
-                    <h3>Brand</h3>
-                    <div class="filter-options">
-                        <% if (filters?.brands?.length) { %>
-                            <% filters.brands.forEach(brand=> { %>
-                                <label class="filter-option">
-                                    <input type="checkbox" name="brand" value="<%= brand.name %>">
-                                    <%= brand.name %>
-                                        <span class="text-secondary">(<%= brand.count %>)</span>
-                                </label>
-                                <% }); %>
-                                    <% } else { %>
-                                        <span class="text-secondary">No brands available</span>
-                                        <% } %>
-                    </div>
-                </div>
-
-                <!-- Colors (Dynamic with Counts) -->
-                <div class="filter-section" data-filter="color">
-                    <h3>Color</h3>
-                    <div class="filter-options">
-                        <% if (filters?.colors?.length) { %>
-                            <% filters.colors.forEach(color=> { %>
-                                <label class="filter-option">
-                                    <input type="checkbox" name="color" value="<%= color.name %>">
-                                    <%= color.name %>
-                                        <span class="text-secondary">(<%= color.count %>)</span>
-                                </label>
-                                <% }); %>
-                                    <% } else { %>
-                                        <span class="text-secondary">No colors available</span>
-                                        <% } %>
-                    </div>
-                </div>
-
-                <!-- Price Range (Counts require additional aggregation - optional) -->
-                <div class="filter-section" data-filter="price">
-                    <h3>Price Range</h3>
-                    <div class="filter-options">
-                        <% if (filters?.priceRanges?.length) { %>
-                            <% filters.priceRanges.forEach(range=> { %>
-                                <label class="filter-option">
-                                    <input type="checkbox" name="price" value="<%= range.value %>"
-                                        data-min="<%= range.min %>" data-max="<%= range.max %>">
-                                    <%= range.label %>
-                                        <% if (range.count> 0) { %>
-                                            <span class="text-secondary">(<%= range.count %>)</span>
+                <!-- Categories Accordion -->
+                <div class="filter-accordion">
+                    <button class="filter-accordion-header" aria-expanded="true" aria-controls="category-content">
+                        <h3>Categories</h3>
+                        <svg class="accordion-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
+                            <path d="M6 9l6 6 6-6"></path>
+                        </svg>
+                    </button>
+                    <div id="category-content" class="filter-accordion-content" style="display: block;">
+                        <div class="filter-options">
+                            <% if (filters?.categories?.length) { %>
+                                <% filters.categories.forEach(category=> { %>
+                                    <label class="filter-option">
+                                        <input type="checkbox" name="category" value="<%= category.name %>"
+                                            <%=selectedCategories?.includes(category.name) ? 'checked' : '' %>>
+                                        <%= category.name %>
+                                            <span class="text-secondary">(<%= category.count %>)</span>
+                                    </label>
+                                    <% }); %>
+                                        <% } else { %>
+                                            <span class="text-secondary">No categories available</span>
                                             <% } %>
-                                </label>
-                                <% }); %>
-                                    <% } else { %>
-                                        <span class="text-secondary">No price data</span>
-                                        <% } %>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Filter Actions -->
+                <!-- Brands Accordion -->
+                <div class="filter-accordion">
+                    <button class="filter-accordion-header" aria-expanded="true" aria-controls="brand-content">
+                        <h3>Brand</h3>
+                        <svg class="accordion-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
+                            <path d="M6 9l6 6 6-6"></path>
+                        </svg>
+                    </button>
+                    <div id="brand-content" class="filter-accordion-content" style="display: block;">
+                        <div class="filter-options">
+                            <% if (filters?.brands?.length) { %>
+                                <% filters.brands.forEach(brand=> { %>
+                                    <label class="filter-option">
+                                        <input type="checkbox" name="brand" value="<%= brand.name %>"
+                                            <%=selectedBrands?.includes(brand.name) ? 'checked' : '' %>>
+                                        <%= brand.name %>
+                                            <span class="text-secondary">(<%= brand.count %>)</span>
+                                    </label>
+                                    <% }); %>
+                                        <% } else { %>
+                                            <span class="text-secondary">No brands available</span>
+                                            <% } %>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Colors Accordion -->
+                <div class="filter-accordion">
+                    <button class="filter-accordion-header" aria-expanded="true" aria-controls="color-content">
+                        <h3>Color</h3>
+                        <svg class="accordion-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
+                            <path d="M6 9l6 6 6-6"></path>
+                        </svg>
+                    </button>
+                    <div id="color-content" class="filter-accordion-content" style="display: block;">
+                        <div class="filter-options">
+                            <% if (filters?.colors?.length) { %>
+                                <% filters.colors.forEach(color=> { %>
+                                    <label class="filter-option">
+                                        <input type="checkbox" name="color" value="<%= color.name %>"
+                                            <%=selectedColors?.includes(color.name) ? 'checked' : '' %>>
+                                        <%= color.name %>
+                                            <span class="text-secondary">(<%= color.count %>)</span>
+                                    </label>
+                                    <% }); %>
+                                        <% } else { %>
+                                            <span class="text-secondary">No colors available</span>
+                                            <% } %>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Price Range Accordion -->
+                <div class="filter-accordion">
+                    <button class="filter-accordion-header" aria-expanded="true" aria-controls="price-content">
+                        <h3>Price Range</h3>
+                        <svg class="accordion-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
+                            <path d="M6 9l6 6 6-6"></path>
+                        </svg>
+                    </button>
+                    <div id="price-content" class="filter-accordion-content" style="display: block;">
+                        <div class="filter-options">
+                            <% if (filters?.priceRanges?.length) { %>
+                                <% filters.priceRanges.forEach(range=> { %>
+                                    <label class="filter-option">
+                                        <input type="checkbox" name="price" value="<%= range.value %>"
+                                            data-min="<%= range.min %>" data-max="<%= range.max %>"
+                                            <%=selectedPrices?.includes(range.value) ? 'checked' : '' %>>
+                                        <%= range.label %>
+                                            <% if (range.count> 0) { %>
+                                                <span class="text-secondary">(<%= range.count %>)</span>
+                                                <% } %>
+                                    </label>
+                                    <% }); %>
+                                        <% } else { %>
+                                            <span class="text-secondary">No price data</span>
+                                            <% } %>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filter Actions (always visible) -->
                 <div class="filter-actions">
                     <div class="filter-buttons">
                         <button type="button" class="filter-reset-button">Reset</button>
@@ -151,7 +189,8 @@
                 <!-- Display product list -->
                 <% if (products && products.length> 0) { %>
                     <% products.forEach(product=> { %>
-                        <div class="product-card" data-category="<%= product.category %>"
+                        <div class="product-card" data-product-id="<%= product._id %>"
+                            data-quantity="<%= product.quantity %>" data-category="<%= product.category %>"
                             data-brand="<%= product.brand %>" data-price="<%= product.price %>"
                             data-date="<%= product.createdAt %>" data-color="<%= product.color %>"
                             data-quantity="<%= product.quantity %>" data-sold="<%= product.sold %>">
@@ -208,9 +247,11 @@
                                                 </div>
                                                 <% } %>
                                         </div>
+                                        <!-- removing desription from products page-->
+                                        <!-- removing desription from products page
                                         <p class="product-description">
                                             <%= product.description %>
-                                        </p>
+                                        </p> -->
                                         <div class="product-details">
                                             <div class="product-color">
                                                 <span class="detail-label">Color:</span>
@@ -246,7 +287,7 @@
                                             stroke-linejoin="round" />
                                     </svg>
                                 </button>
-                                <button class="add-to-cart" <%=product.quantity===0 ? 'disabled' : '' %>>
+                                <button class="add-to-cart" id="cart-icon" <%=product.quantity===0 ? 'disabled' : '' %>>
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
                                         xmlns="http://www.w3.org/2000/svg">
                                         <path

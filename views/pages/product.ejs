@@ -1,7 +1,8 @@
 <section class="product-detail">
     <div class="container">
+        <!-- Back Button -->
         <div class="back-button-container">
-            <button onclick="history.back()" class="back-button">
+            <button onclick="history.back()" class="back-button" aria-label="Go back">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" stroke-width="2"
                         stroke-linecap="round" stroke-linejoin="round" />
@@ -9,134 +10,133 @@
                 Back
             </button>
         </div>
-        <h1 class="product-title">
-            <%= product.title %>
-        </h1>
+
+        <!-- Product Title -->
+        <h1 class="product-title"><%= product.title %></h1>
+
+        <!-- Product Detail Content -->
         <div class="product-detail-content">
+            <!-- Product Gallery -->
             <div class="product-gallery">
-                <% if (product.images && product.images.length> 0) { %>
+                <% if (product.images && product.images.length > 0) { %>
                     <div class="main-image">
                         <img src="<%= product.images[0] %>" alt="<%= product.title %>" id="mainProductImage">
                     </div>
-                    <% if (product.images.length> 1) { %>
+                    <% if (product.images.length > 1) { %>
                         <div class="thumbnail-images">
-                            <% product.images.forEach((image, index)=> { %>
-                                <div class="thumbnail" onclick="changeMainImage('<%= image %>')">
+                            <% product.images.forEach((image, index) => { %>
+                                <button type="button" class="thumbnail" onclick="changeMainImage('<%= image %>')" 
+                                        aria-label="View image <%= index + 1 %>">
                                     <img src="<%= image %>" alt="<%= product.title %> thumbnail <%= index + 1 %>">
-                                </div>
-                                <% }); %>
+                                </button>
+                            <% }); %>
                         </div>
-                        <% } %>
-                            <% } %>
+                    <% } %>
+                <% } else { %>
+                    <div class="main-image">
+                        <div class="product-image-placeholder">No image available</div>
+                    </div>
+                <% } %>
             </div>
+
+            <!-- Product Info -->
             <div class="product-info">
                 <div class="product-header">
                     <div class="product-meta">
-                        <span class="product-brand">
-                            <%= product.brand %>
-                        </span>
-                        <span class="product-category">
-                            <%= product.category %>
-                        </span>
+                        <span class="product-brand"><%= product.brand %></span>
+                        <span class="product-category"><%= product.category %></span>
                     </div>
                 </div>
 
                 <div class="product-price">
-                    <h2>$<%= product.price.toFixed(2) %>
-                    </h2>
-                    <% if (product.ratings && product.ratings.length> 0) { %>
+                    <h2>$<%= product.price.toFixed(2) %></h2>
+                    <% if (product.ratings && product.ratings.length > 0) { %>
                         <div class="product-rating">
-                            <% const avgRating=product.ratings.reduce((acc, curr)=> acc + curr.rating, 0) /
-                                product.ratings.length; %>
-                                <span class="rating-stars">
-                                    <% for(let i=1; i <=5; i++) { %>
-                                        <svg width="20" height="20" viewBox="0 0 24 24"
-                                            fill="<%= i <= avgRating ? '#FFD700' : 'none' %>"
-                                            stroke="<%= i <= avgRating ? '#FFD700' : 'currentColor' %>">
-                                            <path
-                                                d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
-                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                        </svg>
-                                        <% } %>
-                                </span>
-                                <span class="rating-count">(<%= product.ratings.length %> reviews)</span>
+                            <% const avgRating = product.ratings.reduce((acc, curr) => acc + curr.rating, 0) / product.ratings.length; %>
+                            <span class="rating-stars" aria-label="Rating: <%= avgRating.toFixed(1) %> out of 5">
+                                <% for(let i = 1; i <= 5; i++) { %>
+                                    <svg width="20" height="20" viewBox="0 0 24 24"
+                                        fill="<%= i <= avgRating ? '#FFD700' : 'none' %>"
+                                        stroke="<%= i <= avgRating ? '#FFD700' : 'currentColor' %>"
+                                        aria-hidden="true">
+                                        <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                <% } %>
+                            </span>
+                            <span class="rating-count">(<%= product.ratings.length %> reviews)</span>
                         </div>
-                        <% } %>
+                    <% } %>
                 </div>
 
                 <div class="product-description">
                     <h3>Description</h3>
-                    <p>
-                        <%= product.description %>
-                    </p>
+                    <p><%= product.description %></p>
                 </div>
 
                 <div class="product-details">
                     <div class="detail-item">
                         <span class="detail-label">Color:</span>
-                        <span class="detail-value">
-                            <%= product.color %>
-                        </span>
+                        <span class="detail-value"><%= product.color %></span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-label">Availability:</span>
                         <span class="detail-value">
-                            <% if (product.quantity===0) { %>
+                            <% if (product.quantity === 0) { %>
                                 <span class="out-of-stock">Out of Stock</span>
-                                <% } else if (product.quantity <=10) { %>
-                                    <span class="low-stock">Low Stock - <%= product.quantity %> Available</span>
-                                    <% } else { %>
-                                        <span class="in-stock">In Stock - <%= product.quantity %> Available</span>
-                                        <% } %>
+                            <% } else if (product.quantity <= 10) { %>
+                                <span class="low-stock">Low Stock - <%= product.quantity %> Available</span>
+                            <% } else { %>
+                                <span class="in-stock">In Stock - <%= product.quantity %> Available</span>
+                            <% } %>
                         </span>
                     </div>
-                    <% if (product.sold> 0) { %>
+                    <% if (product.sold > 0) { %>
                         <div class="detail-item">
                             <span class="detail-label">Sold:</span>
-                            <span class="detail-value">
-                                <%= product.sold %> units
-                            </span>
+                            <span class="detail-value"><%= product.sold %> units</span>
                         </div>
-                        <% } %>
+                    <% } %>
                 </div>
 
+                <!-- FIXED: Clean Add to Cart button - uses global addToCart from main.js -->
                 <div class="product-actions">
-                    <button class="wishlist-button">
+                    <button class="wishlist-button" aria-label="Add to wishlist">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path
-                                d="M20.84 4.61C20.3292 4.099 19.7228 3.69364 19.0554 3.41708C18.388 3.14052 17.6726 2.99817 16.95 2.99817C16.2274 2.99817 15.512 3.14052 14.8446 3.41708C14.1772 3.69364 13.5708 4.099 13.06 4.61L12 5.67L10.94 4.61C9.9083 3.57831 8.50903 2.9989 7.05 2.9989C5.59096 2.9989 4.19169 3.57831 3.16 4.61C2.1283 5.64169 1.54889 7.04096 1.54889 8.5C1.54889 9.95904 2.1283 11.3583 3.16 12.39L4.22 13.45L12 21.23L19.78 13.45L20.84 12.39C21.351 11.8792 21.7563 11.2728 22.0329 10.6054C22.3095 9.93801 22.4518 9.2226 22.4518 8.5C22.4518 7.7774 22.3095 7.06199 22.0329 6.39458C21.7563 5.72718 21.351 5.12076 20.84 4.61V4.61Z"
-                                stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-                                stroke-linejoin="round" />
+                            <path d="M20.84 4.61C20.3292 4.099 19.7228 3.69364 19.0554 3.41708C18.388 3.14052 17.6726 2.99817 16.95 2.99817C16.2274 2.99817 15.512 3.14052 14.8446 3.41708C14.1772 3.69364 13.5708 4.099 13.06 4.61L12 5.67L10.94 4.61C9.9083 3.57831 8.50903 2.9989 7.05 2.9989C5.59096 2.9989 4.19169 3.57831 3.16 4.61C2.1283 5.64169 1.54889 7.04096 1.54889 8.5C1.54889 9.95904 2.1283 11.3583 3.16 12.39L4.22 13.45L12 21.23L19.78 13.45L20.84 12.39C21.351 11.8792 21.7563 11.2728 22.0329 10.6054C22.3095 9.93801 22.4518 9.2226 22.4518 8.5C22.4518 7.7774 22.3095 7.06199 22.0329 6.39458C21.7563 5.72718 21.351 5.12076 20.84 4.61V4.61Z"
+                                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                         </svg>
-                        Add to Wishlist
+                        Wishlist
                     </button>
-                    <button class="add-to-cart" <%=product.quantity===0 ? 'disabled' : '' %>>
+                    <!-- ✅ FIXED: Simple button - global event delegation in main.js handles the click -->
+                    <button class="add-to-cart" 
+                            data-product-id="<%= product._id %>"
+                            data-product-title="<%= product.title %>"
+                            data-product-price="<%= product.price %>"
+                            data-product-image="<%= product.images?.[0] || '' %>"
+                            data-product-quantity="<%= product.quantity %>"
+                            <%= product.quantity === 0 ? 'disabled' : '' %> 
+                            aria-label="<%= product.quantity === 0 ? 'Out of stock' : 'Add to cart' %>">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path
-                                d="M9 22C9.55228 22 10 21.5523 10 21C10 20.4477 9.55228 20 9 20C8.44772 20 8 20.4477 8 21C8 21.5523 8.44772 22 9 22Z"
-                                stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-                                stroke-linejoin="round" />
-                            <path
-                                d="M20 22C20.5523 22 21 21.5523 21 21C21 20.4477 20.5523 20 20 20C19.4477 20 19 20.4477 19 21C19 21.5523 19.4477 22 20 22Z"
-                                stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-                                stroke-linejoin="round" />
-                            <path
-                                d="M1 1H5L7.68 14.39C7.77144 14.8504 8.02191 15.264 8.38755 15.5583C8.75318 15.8526 9.2107 16.009 9.68 16H19.4C19.8693 16.009 20.3268 15.8526 20.6925 15.5583C21.0581 15.264 21.3086 14.8504 21.4 14.39L23 6H6"
-                                stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-                                stroke-linejoin="round" />
+                            <path d="M9 22C9.55228 22 10 21.5523 10 21C10 20.4477 9.55228 20 9 20C8.44772 20 8 20.4477 8 21C8 21.5523 8.44772 22 9 22Z"
+                                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M20 22C20.5523 22 21 21.5523 21 21C21 20.4477 20.5523 20 20 20C19.4477 20 19 20.4477 19 21C19 21.5523 19.4477 22 20 22Z"
+                                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M1 1H5L7.68 14.39C7.77144 14.8504 8.02191 15.264 8.38755 15.5583C8.75318 15.8526 9.2107 16.009 9.68 16H19.4C19.8693 16.009 20.3268 15.8526 20.6925 15.5583C21.0581 15.264 21.3086 14.8504 21.4 14.39L23 6H6"
+                                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                         </svg>
-                        <%= product.quantity===0 ? 'Out of Stock' : 'Add to Cart' %>
+                        <%= product.quantity === 0 ? 'Out of Stock' : 'Add to Cart' %>
                     </button>
                 </div>
             </div>
         </div>
     </div>
+
     <!-- Related Products Section -->
     <section class="related-products-section">
         <div class="container">
             <div class="section-header">
-                <h3 class="section-title">More in <%= product.category %>
-                </h3>
+                <h3 class="section-title">More in <%= product.category %></h3>
                 <p class="section-subtitle">Explore similar products you might like</p>
             </div>
 
@@ -149,9 +149,8 @@
                     </svg>
                 </button>
 
-                <div class="related-products-grid" id="relatedProductsGrid">
-                    <!-- Related products will be loaded here dynamically -->
-                    <div class="loading-spinner">Loading related products...</div>
+                <div class="related-products-grid" id="relatedProductsGrid" role="list">
+                    <div class="loading-spinner" role="status">Loading related products...</div>
                 </div>
 
                 <button class="carousel-nav next" id="relatedNext" aria-label="Next products">
@@ -163,8 +162,8 @@
             </div>
 
             <!-- Pagination Indicators -->
-            <div class="carousel-indicators" id="relatedIndicators">
-                <!-- Dots will be added by JavaScript -->
+            <div class="carousel-indicators" id="relatedIndicators" role="tablist" aria-label="Related products pages">
+                <!-- Dots added by JavaScript -->
             </div>
         </div>
     </section>
@@ -173,218 +172,190 @@
 <script src="/js/main.js"></script>
 
 <script>
-    function changeMainImage(imageUrl) {
-        document.getElementById('mainProductImage').src = imageUrl;
+// Change main product image
+function changeMainImage(imageUrl) {
+    const mainImage = document.getElementById('mainProductImage');
+    if (mainImage) {
+        mainImage.src = imageUrl;
+        mainImage.alt = '<%= product.title %>';
+    }
+}
+
+// Track recently viewed product (FIXED: moved inside DOMContentLoaded)
+document.addEventListener('DOMContentLoaded', () => {
+    try {
+        const viewedKey = `viewed_<%= product._id %>`;
+        const viewedData = {
+            title: '<%= product.title %>',
+            price: <%= product.price %>,
+            image: '<%= product.images?.[0] || '' %>',
+            viewedAt: new Date().toISOString()
+        };
+        localStorage.setItem(viewedKey, JSON.stringify(viewedData));
+    } catch (e) {
+        console.warn('Could not save recently viewed item:', e);
+    }
+});
+
+// ========================================
+// RELATED PRODUCTS CAROUSEL
+// ========================================
+document.addEventListener('DOMContentLoaded', () => {
+    initRelatedProducts();
+});
+
+async function initRelatedProducts() {
+    const currentProduct = {
+        id: '<%= product._id %>',
+        category: '<%= product.category %>'
+    };
+
+    const grid = document.getElementById('relatedProductsGrid');
+    const prevBtn = document.getElementById('relatedPrev');
+    const nextBtn = document.getElementById('relatedNext');
+    const indicators = document.getElementById('relatedIndicators');
+
+    if (!grid) return;
+
+    let currentPage = 1;
+    let totalPages = 1;
+
+    // Load related products on init
+    await loadRelatedProducts(currentProduct.category, currentProduct.id, 1);
+
+    // Navigation handlers
+    if (prevBtn) {
+        prevBtn.addEventListener('click', async () => {
+            if (currentPage > 1) {
+                await loadRelatedProducts(currentProduct.category, currentProduct.id, currentPage - 1);
+            }
+        });
     }
 
-
-    // ========================================
-    // RELATED PRODUCTS CAROUSEL
-    // ========================================
-
-    document.addEventListener('DOMContentLoaded', () => {
-        initRelatedProducts();
-    });
-
-    async function initRelatedProducts() {
-        const currentProduct = {
-            id: '<%= product._id %>',
-            category: '<%= product.category %>'
-        };
-
-        const grid = document.getElementById('relatedProductsGrid');
-        const prevBtn = document.getElementById('relatedPrev');
-        const nextBtn = document.getElementById('relatedNext');
-        const indicators = document.getElementById('relatedIndicators');
-
-        if (!grid) return;
-
-        let currentPage = 1;
-        let totalPages = 1;
-        let relatedProducts = [];
-
-        // Load related products on init
-        await loadRelatedProducts(currentProduct.category, currentProduct.id, 1);
-
-        // Navigation handlers
-        if (prevBtn) {
-            prevBtn.addEventListener('click', async () => {
-                if (currentPage > 1) {
-                    await loadRelatedProducts(currentProduct.category, currentProduct.id, currentPage - 1);
-                }
-            });
-        }
-
-        if (nextBtn) {
-            nextBtn.addEventListener('click', async () => {
-                if (currentPage < totalPages) {
-                    await loadRelatedProducts(currentProduct.category, currentProduct.id, currentPage + 1);
-                }
-            });
-        }
-
-        //// Main function to fetch and render related products
-        async function loadRelatedProducts(category, excludeProductId, page) {
-            try {
-                grid.innerHTML = '<div class="loading-spinner">Loading...</div>';
-
-                const response = await fetch(`/api/products/related?category=${encodeURIComponent(category)}&productId=${excludeProductId}&page=${page}`);
-
-                if (!response.ok) throw new Error('Failed to fetch related products');
-
-                const { data, total, pages } = await response.json();
-
-                relatedProducts = data;
-                totalPages = pages;
-                currentPage = page;
-
-                if (data.length === 0) {
-                    grid.innerHTML = '<p class="no-related-products">No other products in this category yet.</p>';
-                    updateNavigation();
-                    return;
-                }
-
-                // Render products
-                grid.innerHTML = data.map(product => createRelatedProductCard(product)).join('');
-
-                // Add click handlers to Add to Cart buttons
-                grid.querySelectorAll('.add-to-cart').forEach((btn, index) => {
-                    btn.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        addToCart(data[index]);
-                    });
-                });
-
-                // Update navigation state
-                updateNavigation();
-                updateIndicators();
-
-            } catch (error) {
-                console.error('Error loading related products:', error);
-                grid.innerHTML = '<p class="no-related-products">Unable to load related products.</p>';
-                updateNavigation();
+    if (nextBtn) {
+        nextBtn.addEventListener('click', async () => {
+            if (currentPage < totalPages) {
+                await loadRelatedProducts(currentProduct.category, currentProduct.id, currentPage + 1);
             }
-        }
-        async function loadRelatedProducts(category, excludeProductId, page) {
-            try {
-                grid.innerHTML = '<div class="loading-spinner">Loading...</div>';
+        });
+    }
 
-                const url = `/api/products/related?category=${encodeURIComponent(category)}&productId=${excludeProductId}&page=${page}`;
-                console.log('🔍 Fetching:', url);
+    // Main function to fetch and render related products
+    async function loadRelatedProducts(category, excludeProductId, page) {
+        try {
+            grid.innerHTML = '<div class="loading-spinner" role="status">Loading...</div>';
 
-                const response = await fetch(url);
-                console.log('📡 Response status:', response.status, response.ok);
-
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error('❌ HTTP Error:', response.status, errorText);
-                    throw new Error(`HTTP ${response.status}: ${errorText}`);
-                }
-
-                const jsonResponse = await response.json();
-                // console.log('📦 Full API response:', JSON.stringify(jsonResponse, null, 2)); //for debugging
-
-                // 🔍 Debug: Check what we actually received
-                console.log('🔑 Response keys:', Object.keys(jsonResponse));
-                console.log('📊 data type:', typeof jsonResponse.data, Array.isArray(jsonResponse.data));
-                console.log('📊 products type:', typeof jsonResponse.products, Array.isArray(jsonResponse.products));
-
-                // ✅ Handle different possible response structures
-                let products = [];
-                let total = 0;
-                let pages = 1;
-
-                if (Array.isArray(jsonResponse.data)) {
-                    // Structure: { data: [...], total, pages }
-                    products = jsonResponse.data;
-                    total = jsonResponse.total || products.length;
-                    pages = jsonResponse.pages || 1;
-                } else if (Array.isArray(jsonResponse.products)) {
-                    // Structure: { products: [...], total, pages }
-                    products = jsonResponse.products;
-                    total = jsonResponse.total || products.length;
-                    pages = jsonResponse.pages || 1;
-                } else if (Array.isArray(jsonResponse)) {
-                    // Structure: direct array [...]
-                    products = jsonResponse;
-                    total = products.length;
-                    pages = 1;
-                } else {
-                    // ❌ Unexpected structure
-                    console.error('❌ Unexpected response structure:', jsonResponse);
-                    throw new Error('Invalid response format from server');
-                }
-
-                // Store for pagination
-                window.relatedProductsData = { products, total, pages, currentPage: page };
-
-                if (products.length === 0) {
-                    grid.innerHTML = '<p class="no-related-products">No other products in this category yet.</p>';
-                    updateNavigation();
-                    updateIndicators();
-                    return;
-                }
-
-                // ✅ Now we know products is an array - safe to use map/length
-                grid.innerHTML = products.map(product => createRelatedProductCard(product)).join('');
-
-                // Add click handlers to Add to Cart buttons
-                grid.querySelectorAll('.add-to-cart').forEach((btn, index) => {
-                    btn.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        addToCart(products[index]);
-                    });
-                });
-
-                // Update navigation state
-                totalPages = pages;
-                currentPage = page;
-                updateNavigation();
-                updateIndicators();
-
-            } catch (error) {
-                console.error('❌ Error loading related products:', error);
-                grid.innerHTML = `<p class="no-related-products">Unable to load related products.<br><small>${error.message}</small></p>`;
-                updateNavigation();
-                updateIndicators();
+            const url = `/api/products/related?category=${encodeURIComponent(category)}&productId=${excludeProductId}&page=${page}`;
+            
+            const response = await fetch(url);
+            
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`HTTP ${response.status}: ${errorText}`);
             }
-        }
 
-        // Create product card HTML (matches products.ejs structure)
-        function createRelatedProductCard(product) {
-            const isInStock = product.quantity > 0;
-            const isLowStock = product.quantity > 0 && product.quantity <= 10;
-            const isOutOfStock = product.quantity === 0;
-            // Calculate average rating if ratings exist
-            let ratingHtml = '';
-            if (product.ratings && product.ratings.length > 0) {
-                const avgRating = product.ratings.reduce((acc, curr) => acc + (curr.rating || curr.star || 0), 0) / product.ratings.length;
-                ratingHtml = `
+            const jsonResponse = await response.json();
+
+            // Handle different possible response structures
+            let products = [];
+            let total = 0;
+            let pages = 1;
+
+            if (Array.isArray(jsonResponse.data)) {
+                products = jsonResponse.data;
+                total = jsonResponse.total || products.length;
+                pages = jsonResponse.pages || 1;
+            } else if (Array.isArray(jsonResponse.products)) {
+                products = jsonResponse.products;
+                total = jsonResponse.total || products.length;
+                pages = jsonResponse.pages || 1;
+            } else if (Array.isArray(jsonResponse)) {
+                products = jsonResponse;
+                total = products.length;
+                pages = 1;
+            } else {
+                throw new Error('Invalid response format from server');
+            }
+
+            if (products.length === 0) {
+                grid.innerHTML = '<p class="no-related-products">No other products in this category yet.</p>';
+                updateNavigation();
+                updateIndicators();
+                return;
+            }
+
+            // Render products
+            grid.innerHTML = products.map(product => createRelatedProductCard(product)).join('');
+
+            // Add click handlers to Add to Cart buttons (uses global addToCart from main.js)
+            grid.querySelectorAll('.add-to-cart').forEach((btn, index) => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    // Global addToCart function from main.js will handle this
+                });
+            });
+
+            // Update navigation state
+            totalPages = pages;
+            currentPage = page;
+            updateNavigation();
+            updateIndicators();
+
+        } catch (error) {
+            console.error('Error loading related products:', error);
+            grid.innerHTML = `<p class="no-related-products">Unable to load related products.<br><small>${escapeHtml(error.message)}</small></p>`;
+            updateNavigation();
+            updateIndicators();
+        }
+    }
+
+    // Create product card HTML
+    function createRelatedProductCard(product) {
+        const isInStock = product.quantity > 0;
+        const isLowStock = product.quantity > 0 && product.quantity <= 10;
+        const isOutOfStock = product.quantity === 0;
+
+        // Calculate average rating if ratings exist
+        let ratingHtml = '';
+        if (product.ratings && product.ratings.length > 0) {
+            const avgRating = product.ratings.reduce((acc, curr) => 
+                acc + (curr.rating || curr.star || 0), 0) / product.ratings.length;
+            
+            ratingHtml = `
                 <div class="product-rating">
-                    <span class="rating-stars">
+                    <span class="rating-stars" aria-label="Rating: ${avgRating.toFixed(1)} out of 5">
                         ${Array.from({ length: 5 }, (_, i) => {
-                    const filled = i + 1 <= Math.round(avgRating);
-                    return `<svg width="16" height="16" viewBox="0 0 24 24" fill="${filled ? '#FFD700' : 'none'}" stroke="${filled ? '#FFD700' : 'currentColor'}">
-                                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            const filled = i + 1 <= Math.round(avgRating);
+                            return `<svg width="16" height="16" viewBox="0 0 24 24" 
+                                fill="${filled ? '#FFD700' : 'none'}" 
+                                stroke="${filled ? '#FFD700' : 'currentColor'}"
+                                aria-hidden="true">
+                                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" 
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>`;
-                }).join('')}
+                        }).join('')}
                     </span>
                     <span class="rating-count">(${product.ratings.length})</span>
                 </div>
             `;
-            }
+        }
 
-            return `
-            <div class="related-product-card">
+        return `
+            <div class="related-product-card" role="listitem" 
+                 data-product-id="${product._id}"
+                 data-product-title="${escapeHtml(product.title)}"
+                 data-product-price="${product.price}"
+                 data-product-image="${escapeHtml(product.images?.[0] || '')}"
+                 data-product-quantity="${product.quantity}">
                 <a href="/product/${product._id}" class="product-link">
                     <div class="product-image-container">
-                        ${product.images && product.images[0] ?
-                    `<img src="${product.images[0]}" alt="${escapeHtml(product.title)}" class="product-image">` :
-                    '<div class="product-image-placeholder"></div>'
-                }
-                        ${isLowStock ? '<div class="product-tag low-stock">Low Stock</div>' : ''}
-                        ${isOutOfStock ? '<div class="product-tag out-of-stock">Out of Stock</div>' : ''}
-                        ${!isLowStock && !isOutOfStock ? '<div class="product-tag">New</div>' : ''}
+                        ${product.images && product.images[0] ? 
+                            `<img src="${escapeHtml(product.images[0])}" alt="${escapeHtml(product.title)}" class="product-image">` : 
+                            '<div class="product-image-placeholder">No image</div>'
+                        }
+                        ${isLowStock ? '<div class="product-tag low-stock" aria-label="Low stock">Low Stock</div>' : ''}
+                        ${isOutOfStock ? '<div class="product-tag out-of-stock" aria-label="Out of stock">Out of Stock</div>' : ''}
+                        ${!isLowStock && !isOutOfStock ? '<div class="product-tag" aria-label="New arrival">New</div>' : ''}
                     </div>
                     <div class="product-info">
                         <div class="product-header">
@@ -400,89 +371,81 @@
                     </div>
                 </a>
                 <div class="product-actions">
-                    <button class="wishlist-button" aria-label="Add to wishlist">
+                    <button class="wishlist-button" aria-label="Add ${escapeHtml(product.title)} to wishlist">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M20.84 4.61C20.3292 4.099 19.7228 3.69364 19.0554 3.41708C18.388 3.14052 17.6726 2.99817 16.95 2.99817C16.2274 2.99817 15.512 3.14052 14.8446 3.41708C14.1772 3.69364 13.5708 4.099 13.06 4.61L12 5.67L10.94 4.61C9.9083 3.57831 8.50903 2.9989 7.05 2.9989C5.59096 2.9989 4.19169 3.57831 3.16 4.61C2.1283 5.64169 1.54889 7.04096 1.54889 8.5C1.54889 9.95904 2.1283 11.3583 3.16 12.39L4.22 13.45L12 21.23L19.78 13.45L20.84 12.39C21.351 11.8792 21.7563 11.2728 22.0329 10.6054C22.3095 9.93801 22.4518 9.2226 22.4518 8.5C22.4518 7.7774 22.3095 7.06199 22.0329 6.39458C21.7563 5.72718 21.351 5.12076 20.84 4.61V4.61Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M20.84 4.61C20.3292 4.099 19.7228 3.69364 19.0554 3.41708C18.388 3.14052 17.6726 2.99817 16.95 2.99817C16.2274 2.99817 15.512 3.14052 14.8446 3.41708C14.1772 3.69364 13.5708 4.099 13.06 4.61L12 5.67L10.94 4.61C9.9083 3.57831 8.50903 2.9989 7.05 2.9989C5.59096 2.9989 4.19169 3.57831 3.16 4.61C2.1283 5.64169 1.54889 7.04096 1.54889 8.5C1.54889 9.95904 2.1283 11.3583 3.16 12.39L4.22 13.45L12 21.23L19.78 13.45L20.84 12.39C21.351 11.8792 21.7563 11.2728 22.0329 10.6054C22.3095 9.93801 22.4518 9.2226 22.4518 8.5C22.4518 7.7774 22.3095 7.06199 22.0329 6.39458C21.7563 5.72718 21.351 5.12076 20.84 4.61V4.61Z" 
+                                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                     </button>
-                    <button class="add-to-cart" ${isOutOfStock ? 'disabled' : ''}>
+                    <button class="add-to-cart" 
+                            data-product-id="${product._id}"
+                            data-product-title="${escapeHtml(product.title)}"
+                            data-product-price="${product.price}"
+                            data-product-image="${escapeHtml(product.images?.[0] || '')}"
+                            data-product-quantity="${product.quantity}"
+                            ${isOutOfStock ? 'disabled' : ''} 
+                            aria-label="${isOutOfStock ? 'Out of stock' : `Add ${escapeHtml(product.title)} to cart`}">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M9 22C9.55228 22 10 21.5523 10 21C10 20.4477 9.55228 20 9 20C8.44772 20 8 20.4477 8 21C8 21.5523 8.44772 22 9 22Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M20 22C20.5523 22 21 21.5523 21 21C21 20.4477 20.5523 20 20 20C19.4477 20 19 20.4477 19 21C19 21.5523 19.4477 22 20 22Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M1 1H5L7.68 14.39C7.77144 14.8504 8.02191 15.264 8.38755 15.5583C8.75318 15.8526 9.2107 16.009 9.68 16H19.4C19.8693 16.009 20.3268 15.8526 20.6925 15.5583C21.0581 15.264 21.3086 14.8504 21.4 14.39L23 6H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M9 22C9.55228 22 10 21.5523 10 21C10 20.4477 9.55228 20 9 20C8.44772 20 8 20.4477 8 21C8 21.5523 8.44772 22 9 22Z" 
+                                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M20 22C20.5523 22 21 21.5523 21 21C21 20.4477 20.5523 20 20 20C19.4477 20 19 20.4477 19 21C19 21.5523 19.4477 22 20 22Z" 
+                                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M1 1H5L7.68 14.39C7.77144 14.8504 8.02191 15.264 8.38755 15.5583C8.75318 15.8526 9.2107 16.009 9.68 16H19.4C19.8693 16.009 20.3268 15.8526 20.6925 15.5583C21.0581 15.264 21.3086 14.8504 21.4 14.39L23 6H6" 
+                                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                         ${isOutOfStock ? 'Out of Stock' : 'Add'}
                     </button>
                 </div>
             </div>
         `;
-        }
-
-        // Update navigation button states
-        function updateNavigation() {
-            if (prevBtn) prevBtn.disabled = currentPage <= 1;
-            if (nextBtn) nextBtn.disabled = currentPage >= totalPages;
-        }
-
-        // Update indicator dots
-        function updateIndicators() {
-            if (!indicators) return;
-
-            if (totalPages <= 1) {
-                indicators.innerHTML = '';
-                return;
-            }
-
-            indicators.innerHTML = Array.from({ length: totalPages }, (_, i) => {
-                const isActive = i + 1 === currentPage;
-                return `<button class="carousel-indicator ${isActive ? 'active' : ''}" 
-                           data-page="${i + 1}" 
-                           aria-label="Go to page ${i + 1}"></button>`;
-            }).join('');
-
-            // Add click handlers to indicators
-            indicators.querySelectorAll('.carousel-indicator').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    const page = parseInt(btn.dataset.page);
-                    if (page !== currentPage) {
-                        await loadRelatedProducts(currentProduct.category, currentProduct.id, page);
-                    }
-                });
-            });
-        }
-
-        // Simple add to cart handler (customize with your cart logic)
-        function addToCart(product) {
-            // TODO: Integrate with your actual cart system
-            // For now, show a simple confirmation
-            alert(`${product.title} added to cart!`);
-
-            // Example: Add to localStorage cart
-            /*
-            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-            const existing = cart.find(item => item.productId === product._id);
-            
-            if (existing) {
-                existing.quantity += 1;
-            } else {
-                cart.push({ productId: product._id, quantity: 1, price: product.price });
-            }
-            
-            localStorage.setItem('cart', JSON.stringify(cart));
-            */
-        }
-
-        // Escape HTML to prevent XSS
-        function escapeHtml(text) {
-            if (!text) return '';
-            const map = {
-                '&': '&amp;',
-                '<': '&lt;',
-                '>': '&gt;',
-                '"': '&quot;',
-                "'": '&#039;'
-            };
-            return String(text).replace(/[&<>"']/g, m => map[m]);
-        }
     }
+
+    // Update navigation button states
+    function updateNavigation() {
+        if (prevBtn) prevBtn.disabled = currentPage <= 1;
+        if (nextBtn) nextBtn.disabled = currentPage >= totalPages;
+    }
+
+    // Update indicator dots
+    function updateIndicators() {
+        if (!indicators) return;
+
+        if (totalPages <= 1) {
+            indicators.innerHTML = '';
+            return;
+        }
+
+        indicators.innerHTML = Array.from({ length: totalPages }, (_, i) => {
+            const isActive = i + 1 === currentPage;
+            return `<button class="carousel-indicator ${isActive ? 'active' : ''}" 
+                       data-page="${i + 1}" 
+                       role="tab"
+                       aria-selected="${isActive}"
+                       aria-label="Go to page ${i + 1}"></button>`;
+        }).join('');
+
+        // Add click handlers to indicators
+        indicators.querySelectorAll('.carousel-indicator').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const page = parseInt(btn.dataset.page);
+                if (page !== currentPage) {
+                    await loadRelatedProducts(currentProduct.category, currentProduct.id, page);
+                }
+            });
+        });
+    }
+
+    // Escape HTML to prevent XSS
+    function escapeHtml(text) {
+        if (!text) return '';
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        return String(text).replace(/[&<>"']/g, m => map[m]);
+    }
+}
 </script>

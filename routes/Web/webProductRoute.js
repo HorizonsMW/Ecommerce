@@ -13,6 +13,7 @@ const router = express.Router();
 const { authMiddleware, isAdmin } = require("../../middlewares/authMiddleware");
 const Product = require("../../models/productModel");
 const loadProductFilters = require("../../middlewares/loadProductFilters");
+const asyncHandler = require("express-async-handler");
 
 // web does not need to create yet.
 /* router.post("/", authMiddleware, isAdmin, createProduct);//create a new product */
@@ -129,7 +130,7 @@ router.get("/products", loadProductFilters, async (req, res) => {
 
     //////////////////////////////////////////////////////////////////////
 
-    const { sort, page = 1, limit = 10,...filters } = req.query;
+    const { sort, page = 1, limit = 12, ...filters } = req.query;
     //limit is causing a fixed number of products to be loaded
 
     // Map frontend sort values to MongoDB fields
@@ -147,6 +148,7 @@ router.get("/products", loadProductFilters, async (req, res) => {
 
     // Build query from filters (exclude pagination/sort params)
     const query = {};
+
     if (filters.category) query.category = filters.category;
     if (filters.brand) query.brand = filters.brand;
     if (filters.color) query.color = filters.color;
@@ -174,23 +176,68 @@ router.get("/products", loadProductFilters, async (req, res) => {
     ]);
 
     //////////////////////////////////////////////////////////////////////
+    // Pass selected filters back to pre-check checkboxes
+
+    // Handle both single value and array from query params
+    const selectedCategories = req.query.category
+      ? Array.isArray(req.query.category)
+        ? req.query.category
+        : [req.query.category]
+      : [];
+
+    const selectedPrices = req.query.price
+      ? Array.isArray(req.query.price)
+        ? req.query.price
+        : [req.query.price]
+      : [];
+
+      const selectedBrands = req.query.brand
+      ? Array.isArray(req.query.brand)
+        ? req.query.brand
+        : [req.query.brand]
+      : [];
+
+
+    const selectedColors = req.query.color
+      ? Array.isArray(req.query.color)
+        ? req.query.color
+        : [req.query.color]
+      : [];
+
+    const selectedAvailability = req.query.availability
+      ? Array.isArray(req.query.availability)
+        ? req.query.availability
+        : [req.query.availability]
+      : [];
 
     res.render("pages/products", {
+
       title: "Products",
       products: products,
       layout: "layouts/main",
+
       // ✅ ADD THESE for UI state preservation:
       currentSort: sort, // Current sort value from URL
       currentPage: parseInt(page), // Current page number
       totalPages: Math.ceil(total / parseInt(limit)), // Total pages for pagination
       currentFilters: filters, // Active filters for UI highlighting
       currentLimit: parseInt(limit), // Items per page
+
+      //filters
+      selectedCategories,
+      selectedBrands,
+      selectedColors,
+      selectedAvailability,
+      selectedPrices,
+      //
     });
   } catch (error) {
     console.error("Get products error:", error);
     res.status(500).render("error", { message: "Failed to load products" });
   }
 });
+
+// In routes/Web/productRoutes.js or similar
 
 // GET /api/products/related - Get related products by category
 router.get("/product/:id", async (req, res) => {

@@ -11,7 +11,7 @@ const users = [
     email: "testuser1@example.com",
     mobile: "1234567890",
     password: "Test@1234",
-    isAdmin: false,
+    role: 'user',
     isBlocked: false,
   },
   {
@@ -20,7 +20,7 @@ const users = [
     email: "testuser2@example.com",
     mobile: "1234567891",
     password: "Test@1234",
-    isAdmin: false,
+    //role missing, user
     isBlocked: false,
   },
   {
@@ -29,7 +29,7 @@ const users = [
     email: "admin@example.com",
     mobile: "1234567892",
     password: "Test@1234",
-    isAdmin: true, //Admin privileges
+    role: 'admin', //Admin privileges
     isBlocked: false,
   },
 ];
