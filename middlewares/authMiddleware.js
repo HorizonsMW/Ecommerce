@@ -38,7 +38,6 @@ const authMiddleware = asyncHandler(async (req, res, next) => {
   else if (req.cookies?.token) {
     token = req.cookies.token;
   }
-
   // ❌ No token found in either location
   if (!token) {
     return res.status(401).json({ message: 'There is no token attached to the header or cookie' });

@@ -13,7 +13,7 @@ const cors = require('cors'); // ← Import cors
 const morgan = require('morgan');
 const PORT = process.env.PORT || 4000;
 const expressLayouts = require('express-ejs-layouts'); // Import express-ejs-layouts
-app.use(cookieParser());
+
 
 
 
@@ -66,6 +66,7 @@ app.use(morgan('combined'));//log activity on the console
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+
 app.use(cookieParser());
 
 //root -- remove for testing api

@@ -2,12 +2,38 @@
 ECOMMERCE PROJECT - MASTER STYLESHEET
 Glassmorphism Dark Theme
 Last Updated: 2026
-NOTE: Only section comments added - no property values modified
 ======================================== */
 
 /* ========================================
 1. CSS VARIABLES & GLOBAL RESET
 ======================================== */
+:root {
+  /* Base backgrounds - soft off-white to avoid washing out the gradient */
+  --primary-bg: #f6f4f9;
+  --secondary-bg: rgba(255, 255, 255, 0.65);
+  
+  /* Typography - dark neutrals for high contrast on light surfaces */
+  --text-primary: #10000C;
+  --text-secondary: #0E0016;
+  
+  /* Accents - slightly softened for light mode harmony */
+  --accent-blue: #5c67ff;
+  --accent-blue-hover: #4956e8;
+  
+  /* Borders & Surfaces - subtle dark transparency for light theme */
+  --border-color: rgba(30, 28, 42, 0.08);
+  --card-bg: rgba(255, 255, 255, 0.4);
+  
+  /* Status */
+  --success: #42D79A;
+  
+  /* Glassmorphism optimized for light backgrounds */
+  --glass-bg: rgba(255, 255, 255, 0.3);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --blur-amount: 25px;
+}
+
+/*
 :root {
   --primary-bg: #0f0f0f;
   --secondary-bg: rgba(26, 26, 26, 0.6);
@@ -21,7 +47,7 @@ NOTE: Only section comments added - no property values modified
   --glass-bg: rgba(255, 255, 255, 0.03);
   --glass-border: rgba(255, 255, 255, 0.05);
   --blur-amount: 25px;
-}
+}*/
 
 * {
   margin: 0;
@@ -43,13 +69,13 @@ body {
   overflow-x: hidden;
 }*/
 body {
-    background: 
-      /* Icy pastel cyan glow */
-      radial-gradient(ellipse at top, rgba(152, 226, 244, 0.15) 0%, transparent 50%),
-      /* Soft pale lilac glow */
-      radial-gradient(ellipse at bottom right, rgba(215, 184, 255, 0.12) 0%, transparent 50%),
-      /* Dusty steel blue to dark slate base */
-      linear-gradient(135deg, #171a21 0%, #1f2735 50%, #283545 100%);
+    background:
+      radial-gradient(circle at 20% 25%, #FF9F1C 0%, #FFD6A5 35%, transparent 70%),
+      radial-gradient(circle at 80% 30%, #8A2BE2 0%, #E6D0F5 40%, transparent 75%),
+      radial-gradient(circle at 65% 80%, #00C9A7 0%, #A8E6CF 45%, transparent 80%),
+      radial-gradient(circle at 25% 75%, #FF7F00 0%, #FFCBA4 30%, transparent 65%),
+      radial-gradient(circle at 50% 50%, #9B59B6 0%, #D4A5F5 35%, transparent 70%),
+      linear-gradient(135deg, #F5F0FF 0%, #FFF8F0 50%, #F0FFF9 100%);
   background-attachment: fixed;
   color: var(--text-primary);
   line-height: 1.6;
@@ -72,7 +98,6 @@ body {
   padding: 2rem 3rem;
   padding-bottom: 200px; /* Space for bottom nav + footer */
   min-height: 100vh;
-  background: var(--glass-bg);
   backdrop-filter: blur(var(--blur-amount));
   -webkit-backdrop-filter: blur(var(--blur-amount));
   border-radius: 24px;
@@ -135,7 +160,7 @@ body {
   align-items: center;
   gap: 0.4rem;
   padding: 0.75rem 1.25rem;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--text-secondary);
   text-decoration: none;
   border-radius: 14px;
   transition: all 0.3s ease;
@@ -163,7 +188,7 @@ body {
 
 .bottom-nav-link:hover,
 .bottom-nav-link.active {
-  color: #ffffff;
+  color: var(--text-primary);
   transform: translateY(-3px);
 }
 
@@ -188,7 +213,8 @@ body {
   left: 0;
   right: 0;
   margin-bottom: 20px;
-  background: rgba(26, 26, 46, 0.4);
+  background:var(--glass-bg);
+  box-shadow: 0 8px 32px rgba(30, 28, 42, 0.06);
   backdrop-filter: blur(var(--blur-amount));
   -webkit-backdrop-filter: blur(var(--blur-amount));
   border-bottom: 1px solid var(--glass-border);
@@ -352,7 +378,7 @@ body {
   font-weight: 800;
   line-height: 1.2;
   margin-bottom: 1.5rem;
-  background: linear-gradient(135deg, #ffffff 0%, var(--accent-blue) 100%);
+  background: linear-gradient(135deg, var(--text-secondary) 0%, var(--text-primary) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -394,7 +420,7 @@ body {
   font-weight: 700;
   text-align: center;
   margin-bottom: 3rem;
-  background: linear-gradient(135deg, #ffffff 0%, var(--accent-blue) 100%);
+  background: linear-gradient(135deg, var(--text-secondary) 0%, var(--text-primary) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -1014,10 +1040,9 @@ body {
   position: sticky;
   top: 100px;
   align-self: start;
-  max-height: calc(100vh - 120px);
   overflow-y: auto;
   scrollbar-width: thin;
-  scrollbar-color: var(--glass-border) transparent;
+  scrollbar-color: var(--card-bg) transparent;
 }
 
 .filters-column::-webkit-scrollbar {
@@ -1141,6 +1166,77 @@ body {
   color: var(--text-primary);
   border-color: var(--accent-blue);
 }
+
+
+/* ========================================
+FILTER ACCORDION (Products Page)
+======================================== */
+.filter-accordion {
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.filter-accordion:last-child {
+  margin-bottom: 0;
+  border-bottom: none;
+}
+
+.filter-accordion-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.filter-accordion-header:hover {
+  color: var(--accent-blue);
+}
+
+.filter-accordion-header h3 {
+  margin: 0;
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+.accordion-icon {
+  transition: transform 0.3s ease;
+  flex-shrink: 0;
+}
+
+.filter-accordion-header[aria-expanded="true"] .accordion-icon {
+  transform: rotate(180deg);
+}
+
+.filter-accordion-content {
+  overflow: hidden;
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+  max-height: 500px; /* Adjust based on content */
+  opacity: 1;
+}
+
+.filter-accordion-content[style*="display: none"] {
+  max-height: 0;
+  opacity: 0;
+  padding: 0 !important;
+}
+
+/* Optional: Add subtle animation to options inside */
+.filter-accordion-content .filter-option {
+  transition: opacity 0.2s ease;
+}
+
+.filter-accordion-content[style*="display: none"] .filter-option {
+  opacity: 0;
+}
+
 
 /* Products Grid */
 .products-grid {
@@ -1621,7 +1717,7 @@ body {
 ======================================== */
 .glass-footer {
   position: relative;
-  background: rgba(26, 26, 46, 0.4);
+  background: var(--glass-bg);
   backdrop-filter: blur(var(--blur-amount));
   -webkit-backdrop-filter: blur(var(--blur-amount));
   border-top: 1px solid var(--glass-border);
@@ -1737,6 +1833,7 @@ body {
   position: relative;
   z-index: 1;
   flex-wrap: wrap;
+  margin: 3rem;
   margin-bottom: 150px;
   gap: 1.5rem;
 }

@@ -33,37 +33,42 @@ const loginUserCtrl = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
   //console.log(email,password);
   //check if user exists
-  const findUser = await User.findOne({ email }); //true or false
+  const findUser = await User.findOne({ email }).select('+password'); //true or false
   //console.log(findUser) //return user with inpute email
 
   if (findUser && (await findUser.isPasswordMatched(password))) {
     //res.json(findUser); //return the found user
 
+    ///////////////////////////////////////////////////////////////////////
+    // /
+    // In controller/userCtrl.js, inside loginUserCtrl, AFTER generating token:
 
-///////////////////////////////////////////////////////////////////////
-// /
-// In controller/userCtrl.js, inside loginUserCtrl, AFTER generating token:
+    const accessToken = generateToken(findUser._id); // Your existing JWT generation
 
-const accessToken = generateToken(findUser._id); // Your existing JWT generation
+    // 🍪 Set httpOnly cookie for SSR page protection
+    res.cookie("token", accessToken, {
+      httpOnly: true, // ❌ JavaScript can't access (XSS protection)
+      secure: process.env.NODE_ENV === "production", // ✅ HTTPS only in prod
+      sameSite: "lax", // ✅ CSRF protection
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours (match your JWT expiry)
+    });
 
-
-// 🍪 Set httpOnly cookie for SSR page protection
-res.cookie('token', accessToken, {
-  httpOnly: true,              // ❌ JavaScript can't access (XSS protection)
-  secure: process.env.NODE_ENV === 'production', // ✅ HTTPS only in prod
-  sameSite: 'lax',             // ✅ CSRF protection
-  maxAge: 24 * 60 * 60 * 1000  // 24 hours (match your JWT expiry)
-});
-
-// Also keep your existing refreshToken cookie
-// Return response (token still in body for API clients)
-///////////////////////////////////////////////////////////////////////
+    // Also keep your existing refreshToken cookie
+    // Return response (token still in body for API clients)
+    ///////////////////////////////////////////////////////////////////////
     const refreshToken = await generaterefreshToken(findUser?._id);
+
+    findUser.refreshToken =
+      typeof refreshToken === "object" && refreshToken.$oid
+        ? refreshToken.$oid
+        : refreshToken; // ✅ Plain string
+
     const updateUser = await User.findByIdAndUpdate(
       findUser.id,
       { refreshToken: refreshToken },
       { new: true },
     );
+
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       maxAge: 72 * 60 * 60 * 1000,
@@ -75,13 +80,14 @@ res.cookie('token', accessToken, {
       email: findUser.email,
       mobile: findUser.mobile,
       token: accessToken,
-      redirect: req.query.redirect || '/user/profile',//API clients to also get the redirect URL (for SPA frontends):
+      redirect: req.query.redirect || "/user/profile", //API clients to also get the redirect URL (for SPA frontends):
     });
   } else {
     //res.send("Invalid credentials");//this is an alternative sub for issue updated* err?message thing in errorHandler -- solved
     throw new Error("Invalid credentials"); //custom message not working due to the *updated* err?message thing in errorHandler
   }
 });
+
 //handle refresh Token
 const handleRefreshToken = asyncHandler(async (req, res) => {
   const cookie = req.cookies;
@@ -106,50 +112,59 @@ const handleRefreshToken = asyncHandler(async (req, res) => {
 });
 
 // controller/userCtrl.js
+// ✅ NEW: Complete logout that clears ALL auth state
 const logout = asyncHandler(async (req, res) => {
-  const cookie = req.cookies;
+  const { refreshToken } = req.cookies;
+  const cleanRefreshToken =
+    typeof refreshToken === "object" && refreshToken.$oid
+      ? refreshToken.$oid
+      : refreshToken;
 
-  // 1. Check if refreshToken exists in cookies
-  if (!cookie?.refreshToken) {
-    return res.status(400).json({ message: "No refresh token in cookies" });
-  }
+  // 🔑 KEY DIFFERENCE 1: Clear BOTH cookies (token + refreshToken)
+  //  old code only cleared refreshToken, leaving the main auth token valid
 
-  const refreshToken = cookie.refreshToken;
-
-  // 2. Find user with this refreshToken
-  const user = await User.findOne({ refreshToken });
-
-  // 3. If no user found, clear cookie anyway and return
-  if (!user) {
-    res.clearCookie("refreshToken", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // ✅ Only secure in prod
-      sameSite: "lax",
-    });
-    return res.sendStatus(204); // No Content (not "forbidden" - 403 is forbidden)
-  }
-
-  // 4. ✅ CORRECTED: Use filter object { refreshToken: refreshToken }
-  await User.findOneAndUpdate(
-    { refreshToken: refreshToken }, // ✅ Filter: find user BY this refreshToken
-    { refreshToken: "" }, // ✅ Update: clear the refreshToken field
-  );
-
-  // 5. Clear the httpOnly cookie
-  res.clearCookie("refreshToken", {
+  const cookieOptions = {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
-  });
+    path: "/", // ✅ Ensure cookie is cleared from all paths
+  };
 
-  // 6. Send success response
-  res.sendStatus(204); // No Content = successful logout
+  // Clear the main auth token cookie (used by isLoggedIn middleware)
+  res.clearCookie("token", cookieOptions);
+
+  // Clear the refresh token cookie
+  if (refreshToken) {
+    // 🔑 KEY DIFFERENCE 2: Also invalidate refreshToken in database
+    await User.findOneAndUpdate(
+      { refreshToken: cleanRefreshToken  }, // Find user with this refresh token
+      { refreshToken: "" }, // Clear it
+    );
+    res.clearCookie("refreshToken", cookieOptions);
+  }
+
+  // 🔑 KEY DIFFERENCE 3: Return redirect URL for frontend + handle API/web requests
+  const isApiRequest =
+    req.path.startsWith("/api/") ||
+    req.headers["accept"]?.includes("application/json");
+
+  if (isApiRequest) {
+    // API client: Return JSON with redirect instruction
+    return res.json({
+      success: true,
+      message: "Logged out successfully",
+      redirect: "/user/login",
+    });
+  } else {
+    // Web browser: Redirect to login page
+    return res.redirect("/user/login?message=Logged+out+successfully");
+  }
 });
 
 //update a user
 const updateAUser = asyncHandler(async (req, res) => {
-    const userId = req.user._id.toString();
-    validateMongoDbId(userId);
+  const userId = req.user._id.toString();
+  validateMongoDbId(userId);
   // Inside updateAUser, before findByIdAndUpdate:
   if (req.body.email && req.body.email !== req.user.email) {
     const existing = await User.findOne({ email: req.body.email });
@@ -169,7 +184,7 @@ const updateAUser = asyncHandler(async (req, res) => {
       {
         new: true,
       },
-    );
+    ).select('-password -refreshToken'); //exlude password and token
     res.json(updateUser);
   } catch (error) {
     throw new Error(error);
@@ -256,44 +271,44 @@ const unblockAUser = asyncHandler(async (req, res) => {
 
 // Verify user password before sensitive actions
 const verifyPassword = asyncHandler(async (req, res) => {
-    const { password } = req.body;
-    
-    // 1. Validate input
-    if (!password) {
-        return res.status(400).json({ message: "Password is required" });
-    }
-    
-    // 2. Get authenticated user
-    const user = req.user;
-    if (!user || !user._id) {
-        return res.status(401).json({ message: "User not authenticated" });
-    }
-    
-    // 3. 🔐 Re-fetch user WITH password for comparison
-    //    authMiddleware excluded it, so we need to explicitly include it
-    const userWithPassword = await User.findById(user._id).select('+password');
-    
-    if (!userWithPassword) {
-        return res.status(404).json({ message: "User not found" });
-    }
-    
-    // 4. Debug logging (remove after testing)
-    console.log('🔐 verifyPassword debug:', {
-        hasEnteredPassword: !!password,
-        hasStoredPassword: !!userWithPassword.password,
-        storedPasswordType: typeof userWithPassword.password,
-        storedPasswordLength: userWithPassword.password?.length
-    });
-    
-    // 5. Use your existing isPasswordMatched method
-    const isMatch = await userWithPassword.isPasswordMatched(password);
-    
-    if (!isMatch) {
-        return res.status(401).json({ message: "Incorrect password" });
-    }
-    
-    // 6. ✅ Password verified
-    res.json({ success: true, message: "Password verified" });
+  const { password } = req.body;
+
+  // 1. Validate input
+  if (!password) {
+    return res.status(400).json({ message: "Password is required" });
+  }
+
+  // 2. Get authenticated user
+  const user = req.user;
+  if (!user || !user._id) {
+    return res.status(401).json({ message: "User not authenticated" });
+  }
+
+  // 3. 🔐 Re-fetch user WITH password for comparison
+  //    authMiddleware excluded it, so we need to explicitly include it
+  const userWithPassword = await User.findById(user._id).select("+password");
+
+  if (!userWithPassword) {
+    return res.status(404).json({ message: "User not found" });
+  }
+
+  // 4. Debug logging (remove after testing)
+  console.log("🔐 verifyPassword debug:", {
+    hasEnteredPassword: !!password,
+    hasStoredPassword: !!userWithPassword.password,
+    storedPasswordType: typeof userWithPassword.password,
+    storedPasswordLength: userWithPassword.password?.length,
+  });
+
+  // 5. Use your existing isPasswordMatched method
+  const isMatch = await userWithPassword.isPasswordMatched(password);
+
+  if (!isMatch) {
+    return res.status(401).json({ message: "Incorrect password" });
+  }
+
+  // 6. ✅ Password verified
+  res.json({ success: true, message: "Password verified" });
 });
 
 module.exports = {
