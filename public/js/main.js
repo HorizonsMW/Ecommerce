@@ -84,6 +84,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Reset filters
   // In main.js, update filterResetButton listener:
+  let overlay = document.querySelector(".filters-overlay");
+  if (!overlay) {
+    overlay = document.createElement("div");
+    overlay.className = "filters-overlay";
+    document.body.appendChild(overlay);
+  }
 
   if (filterResetButton) {
     filterResetButton.addEventListener("click", function (e) {
@@ -137,164 +143,7 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
   }
-
-  /*
-  // Apply filters when OK button is clicked
-  if (filterOkButton) {
-    filterOkButton.addEventListener("click", function () {
-      const selectedCategories = Array.from(
-        document.querySelectorAll('input[name="category"]:checked'),
-      ).map((cb) => cb.value);
-      const selectedPrices = Array.from(
-        document.querySelectorAll('input[name="price"]:checked'),
-      ).map((cb) => cb.value);
-      const selectedBrands = Array.from(
-        document.querySelectorAll('input[name="brand"]:checked'),
-      ).map((cb) => cb.value);
-      const selectedColors = Array.from(
-        document.querySelectorAll('input[name="color"]:checked'),
-      ).map((cb) => cb.value);
-      const selectedAvailability = Array.from(
-        document.querySelectorAll('input[name="availability"]:checked'),
-      ).map((cb) => cb.value);
-
-      // Get current sort value
-      const currentSort = sortSelect ? sortSelect.value : "newest";
-
-      // Filter products based on selections
-      const filteredProducts = allProducts.filter((product) => {
-        const productCategory = product.dataset.category;
-        const productPrice = parseFloat(product.dataset.price);
-        const productBrand = product.dataset.brand;
-        const productColor = product.dataset.color;
-        const productQuantity = parseInt(product.dataset.quantity);
-        /*
-        // Check if product matches any selected category
-        const categoryMatch =
-          selectedCategories.length === 0 ||
-          selectedCategories.includes(productCategory);// removed closing start/
-
-        // 🔥 REPLACE WITH THIS (normalized matching):
-        const categoryMatch =
-          selectedCategories.length === 0 ||
-          selectedCategories.some(
-            (sel) =>
-              normalizeCategory(sel) === normalizeCategory(productCategory),
-          );
-
-        // Check if product price is within any selected range
-        const priceMatch =
-          selectedPrices.length === 0 ||
-          selectedPrices.some((range) => {
-            if (range === "2000+") {
-              return productPrice >= 2000;
-            }
-            const [min, max] = range.split("-").map(Number);
-            return productPrice >= min && productPrice <= max;
-          });
-
-        // Check if product brand matches any selected brand
-        const brandMatch =
-          selectedBrands.length === 0 || selectedBrands.includes(productBrand);
-
-        // Check if product color matches any selected color
-        const colorMatch =
-          selectedColors.length === 0 || selectedColors.includes(productColor);
-
-        // Check availability
-        const availabilityMatch =
-          selectedAvailability.length === 0 ||
-          selectedAvailability.some((avail) => {
-            if (avail === "in-stock") return productQuantity > 0;
-            if (avail === "low-stock")
-              return productQuantity > 0 && productQuantity <= 10;
-            return true;
-          });
-
-        return (
-          categoryMatch &&
-          priceMatch &&
-          brandMatch &&
-          colorMatch &&
-          availabilityMatch
-        );
-      });
-
-      // Clear current products
-      productsGrid.innerHTML = "";
-
-      // Add filtered products
-      if (filteredProducts.length > 0) {
-        filteredProducts.forEach((product) =>
-          productsGrid.appendChild(product),
-        );
-      } else {
-        productsGrid.innerHTML =
-          '<p class="no-products">No products match your filters.</p>';
-      }
-
-      // Close filter panel on mobile
-      if (window.innerWidth <= 768) {
-        filtersColumn.classList.remove("active");
-      }
-
-      // Apply current sort to filtered products
-      if (sortSelect) {
-        sortSelect.value = currentSort;
-        const products = Array.from(document.querySelectorAll(".product-card"));
-
-        products.sort((a, b) => {
-          switch (currentSort) {
-            case "price-low":
-              return (
-                parseFloat(
-                  a.querySelector(".product-price").textContent.match(/\d+/)[0],
-                ) -
-                parseFloat(
-                  b.querySelector(".product-price").textContent.match(/\d+/)[0],
-                )
-              );
-            case "price-high":
-              return (
-                parseFloat(
-                  b.querySelector(".product-price").textContent.match(/\d+/)[0],
-                ) -
-                parseFloat(
-                  a.querySelector(".product-price").textContent.match(/\d+/)[0],
-                )
-              );
-            case "name-asc":
-              return a
-                .querySelector(".product-title")
-                .textContent.trim()
-                .localeCompare(
-                  b.querySelector(".product-title").textContent.trim(),
-                );
-            case "name-desc":
-              return b
-                .querySelector(".product-title")
-                .textContent.trim()
-                .localeCompare(
-                  a.querySelector(".product-title").textContent.trim(),
-                );
-            case "newest":
-              return new Date(b.dataset.date) - new Date(a.dataset.date);
-            case "oldest":
-              return new Date(a.dataset.date) - new Date(b.dataset.date);
-            default:
-              return 0;
-          }
-        });
-
-        products.forEach((product) => productsGrid.appendChild(product));
-      }
-
-      // Reset pagination
-      currentPage = 1;
-      updatePagination();
-    });
-  }*/
-  // In DOMContentLoaded, replace the filterOkButton listener:
+  // filterOkButton listener:
 
   if (filterOkButton) {
     filterOkButton.addEventListener("click", function (e) {
@@ -639,8 +488,10 @@ document.addEventListener("DOMContentLoaded", () => {
     filterToggle.addEventListener("click", () => {
       filtersColumn.classList.add("active");
       overlay.classList.add("active");
-      document.body.style.overflow = "hidden"; // Prevent background scroll
-      document.body.style.zIndex = "20"; // Prevent background scroll
+
+      // ✅ Ensure filters-column can scroll independently
+      filtersColumn.style.overflowY = "auto";
+      filtersColumn.style.pointerEvents = "auto";
     });
   }
 

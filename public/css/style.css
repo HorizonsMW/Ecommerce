@@ -11,26 +11,32 @@ Last Updated: 2026
   /* Base backgrounds - soft off-white to avoid washing out the gradient */
   --primary-bg: #f6f4f9;
   --secondary-bg: rgba(255, 255, 255, 0.65);
-  
+
   /* Typography - dark neutrals for high contrast on light surfaces */
-  --text-primary: #10000C;
-  --text-secondary: #0E0016;
-  
+  --text-primary: #10000c;
+  --text-secondary: #0e0016;
+
   /* Accents - slightly softened for light mode harmony */
   --accent-blue: #5c67ff;
   --accent-blue-hover: #4956e8;
-  
+
   /* Borders & Surfaces - subtle dark transparency for light theme */
   --border-color: rgba(30, 28, 42, 0.08);
   --card-bg: rgba(255, 255, 255, 0.4);
-  
+
   /* Status */
-  --success: #42D79A;
-  
+  --success: #42d79a;
+
   /* Glassmorphism optimized for light backgrounds */
   --glass-bg: rgba(255, 255, 255, 0.3);
   --glass-border: rgba(255, 255, 255, 0.2);
   --blur-amount: 25px;
+
+  /* ✅ Safe area insets for notched devices */
+  --safe-area-top: env(safe-area-inset-top);
+  --safe-area-right: env(safe-area-inset-right);
+  --safe-area-bottom: env(safe-area-inset-bottom);
+  --safe-area-left: env(safe-area-inset-left);
 }
 
 /*
@@ -53,7 +59,16 @@ Last Updated: 2026
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family:
+    "Nunito",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    sans-serif;
 }
 /*
 body {
@@ -69,17 +84,42 @@ body {
   overflow-x: hidden;
 }*/
 body {
-    background:
-      radial-gradient(circle at 20% 25%, #FF9F1C 0%, #FFD6A5 35%, transparent 70%),
-      radial-gradient(circle at 80% 30%, #8A2BE2 0%, #E6D0F5 40%, transparent 75%),
-      radial-gradient(circle at 65% 80%, #00C9A7 0%, #A8E6CF 45%, transparent 80%),
-      radial-gradient(circle at 25% 75%, #FF7F00 0%, #FFCBA4 30%, transparent 65%),
-      radial-gradient(circle at 50% 50%, #9B59B6 0%, #D4A5F5 35%, transparent 70%),
-      linear-gradient(135deg, #F5F0FF 0%, #FFF8F0 50%, #F0FFF9 100%);
+  background:
+    radial-gradient(
+      circle at 20% 25%,
+      #ff9f1c 0%,
+      #ffd6a5 35%,
+      transparent 70%
+    ),
+    radial-gradient(
+      circle at 80% 30%,
+      #8a2be2 0%,
+      #e6d0f5 40%,
+      transparent 75%
+    ),
+    radial-gradient(
+      circle at 65% 80%,
+      #00c9a7 0%,
+      #a8e6cf 45%,
+      transparent 80%
+    ),
+    radial-gradient(
+      circle at 25% 75%,
+      #ff7f00 0%,
+      #ffcba4 30%,
+      transparent 65%
+    ),
+    radial-gradient(
+      circle at 50% 50%,
+      #9b59b6 0%,
+      #d4a5f5 35%,
+      transparent 70%
+    ),
+    linear-gradient(135deg, #f5f0ff 0%, #fff8f0 50%, #f0fff9 100%);
   background-attachment: fixed;
   color: var(--text-primary);
   line-height: 1.6;
-  min-height: 100vh;
+  min-height: 100dvh;
   padding: 10px;
   overflow-x: hidden;
 }
@@ -101,7 +141,7 @@ body {
   backdrop-filter: blur(var(--blur-amount));
   -webkit-backdrop-filter: blur(var(--blur-amount));
   border-radius: 24px;
-  box-shadow: 
+  box-shadow:
     0 20px 60px rgba(0, 0, 0, 0.4),
     0 0 0 1px var(--glass-border);
   position: relative;
@@ -122,7 +162,7 @@ body {
 
 .glass-card:hover {
   transform: translateY(-5px);
-  box-shadow: 
+  box-shadow:
     0 25px 50px rgba(0, 0, 0, 0.4),
     0 0 0 1px rgba(255, 255, 255, 0.15);
 }
@@ -138,6 +178,10 @@ body {
   z-index: 999;
   width: auto;
   max-width: 90%;
+
+  padding-bottom: var(--safe-area-bottom);
+  bottom: calc(2rem + var(--safe-area-bottom)); /* ✅ Account for safe area */
+
 }
 
 .bottom-nav-content {
@@ -149,7 +193,7 @@ body {
   border: 1px solid var(--glass-border);
   border-radius: 20px;
   padding: 0.75rem 1rem;
-  box-shadow: 
+  box-shadow:
     0 10px 40px rgba(0, 0, 0, 0.4),
     0 0 0 1px var(--glass-border);
 }
@@ -169,13 +213,17 @@ body {
 }
 
 .bottom-nav-link::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, rgba(0, 102, 255, 0.15) 0%, rgba(0, 102, 255, 0.05) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(0, 102, 255, 0.15) 0%,
+    rgba(0, 102, 255, 0.05) 100%
+  );
   opacity: 0;
   transition: opacity 0.3s ease;
   border-radius: 14px;
@@ -209,11 +257,12 @@ body {
 ======================================== */
 .glass-header {
   position: sticky;
+  padding-top: var(--safe-area-top);
   top: 0;
   left: 0;
   right: 0;
   margin-bottom: 20px;
-  background:var(--glass-bg);
+  background: var(--glass-bg);
   box-shadow: 0 8px 32px rgba(30, 28, 42, 0.06);
   backdrop-filter: blur(var(--blur-amount));
   -webkit-backdrop-filter: blur(var(--blur-amount));
@@ -221,6 +270,7 @@ body {
   border-radius: 0 0 24px 24px;
   z-index: 999;
   transition: all 0.3s ease;
+  
 }
 
 .glass-header .container {
@@ -233,6 +283,8 @@ body {
   align-items: center;
   padding: 1rem 0;
   min-height: 72px;
+  flex-wrap: wrap; /* ✅ Allow wrapping on small screens */
+  gap: 1rem; /* ✅ Space between wrapped items */
 }
 
 /* Header Search */
@@ -244,6 +296,7 @@ body {
 
 .glass-header .search-form {
   display: flex;
+  min-width: 0;
   align-items: center;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--glass-border);
@@ -321,7 +374,11 @@ body {
   position: absolute;
   top: 8px;
   right: 8px;
-  background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-blue-hover) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--accent-blue) 0%,
+    var(--accent-blue-hover) 100%
+  );
   color: white;
   font-size: 0.65rem;
   padding: 0.2rem 0.45rem;
@@ -337,7 +394,11 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 0.75rem;
-  background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-blue-hover) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--accent-blue) 0%,
+    var(--accent-blue-hover) 100%
+  );
   color: white;
   border: none;
   padding: 1.25rem 2.5rem;
@@ -378,7 +439,11 @@ body {
   font-weight: 800;
   line-height: 1.2;
   margin-bottom: 1.5rem;
-  background: linear-gradient(135deg, var(--text-secondary) 0%, var(--text-primary) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--text-secondary) 0%,
+    var(--text-primary) 100%
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -420,7 +485,11 @@ body {
   font-weight: 700;
   text-align: center;
   margin-bottom: 3rem;
-  background: linear-gradient(135deg, var(--text-secondary) 0%, var(--text-primary) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--text-secondary) 0%,
+    var(--text-primary) 100%
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -447,7 +516,7 @@ body {
 
 .category-card:hover {
   transform: translateY(-10px);
-  box-shadow: 
+  box-shadow:
     0 30px 60px rgba(0, 0, 0, 0.4),
     0 0 0 1px rgba(0, 102, 255, 0.2);
 }
@@ -626,7 +695,7 @@ body {
 .category-card:hover {
   transform: translateY(-10px);
   border-color: rgba(0, 102, 255, 0.3);
-  box-shadow: 
+  box-shadow:
     0 30px 60px rgba(0, 0, 0, 0.4),
     0 0 0 1px rgba(0, 102, 255, 0.2);
 }
@@ -790,7 +859,7 @@ body {
 
 .product-card:hover {
   transform: translateY(-8px);
-  box-shadow: 
+  box-shadow:
     0 25px 50px rgba(0, 0, 0, 0.4),
     0 0 0 1px rgba(255, 255, 255, 0.15);
 }
@@ -827,7 +896,11 @@ body {
   position: absolute;
   top: 1rem;
   left: 1rem;
-  background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-blue-hover) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--accent-blue) 0%,
+    var(--accent-blue-hover) 100%
+  );
   color: white;
   font-size: 0.75rem;
   padding: 0.4rem 0.8rem;
@@ -893,7 +966,11 @@ body {
 }
 
 .add-to-cart {
-  background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-blue-hover) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--accent-blue) 0%,
+    var(--accent-blue-hover) 100%
+  );
   color: white;
   border: none;
   box-shadow: 0 4px 15px rgba(0, 102, 255, 0.4);
@@ -1144,7 +1221,11 @@ body {
 }
 
 .filter-ok-button {
-  background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-blue-hover) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--accent-blue) 0%,
+    var(--accent-blue-hover) 100%
+  );
   color: white;
   border: none;
   box-shadow: 0 4px 15px rgba(0, 102, 255, 0.3);
@@ -1166,7 +1247,6 @@ body {
   color: var(--text-primary);
   border-color: var(--accent-blue);
 }
-
 
 /* ========================================
 FILTER ACCORDION (Products Page)
@@ -1217,7 +1297,9 @@ FILTER ACCORDION (Products Page)
 
 .filter-accordion-content {
   overflow: hidden;
-  transition: max-height 0.3s ease, opacity 0.3s ease;
+  transition:
+    max-height 0.3s ease,
+    opacity 0.3s ease;
   max-height: 500px; /* Adjust based on content */
   opacity: 1;
 }
@@ -1236,7 +1318,6 @@ FILTER ACCORDION (Products Page)
 .filter-accordion-content[style*="display: none"] .filter-option {
   opacity: 0;
 }
-
 
 /* Products Grid */
 .products-grid {
@@ -1262,7 +1343,7 @@ FILTER ACCORDION (Products Page)
 .product-card:hover {
   transform: translateY(-8px);
   border-color: rgba(0, 102, 255, 0.3);
-  box-shadow: 
+  box-shadow:
     0 25px 50px rgba(0, 0, 0, 0.4),
     0 0 0 1px rgba(0, 102, 255, 0.2);
 }
@@ -1308,7 +1389,11 @@ FILTER ACCORDION (Products Page)
   position: absolute;
   top: 1rem;
   left: 1rem;
-  background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-blue-hover) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--accent-blue) 0%,
+    var(--accent-blue-hover) 100%
+  );
   color: white;
   font-size: 0.7rem;
   padding: 0.4rem 0.8rem;
@@ -1459,7 +1544,11 @@ FILTER ACCORDION (Products Page)
 }
 
 .add-to-cart {
-  background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-blue-hover) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--accent-blue) 0%,
+    var(--accent-blue-hover) 100%
+  );
   color: white;
   border: none;
   box-shadow: 0 4px 15px rgba(0, 102, 255, 0.3);
@@ -1621,7 +1710,7 @@ FILTER ACCORDION (Products Page)
 .feature-card:hover {
   transform: translateY(-5px);
   border-color: rgba(0, 102, 255, 0.2);
-  box-shadow: 
+  box-shadow:
     0 20px 40px rgba(0, 0, 0, 0.4),
     0 0 0 1px rgba(0, 102, 255, 0.15);
 }
@@ -1630,7 +1719,11 @@ FILTER ACCORDION (Products Page)
   width: 80px;
   height: 80px;
   margin: 0 auto 1.5rem;
-  background: linear-gradient(135deg, rgba(0, 102, 255, 0.15) 0%, rgba(0, 102, 255, 0.05) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(0, 102, 255, 0.15) 0%,
+    rgba(0, 102, 255, 0.05) 100%
+  );
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -1697,7 +1790,11 @@ FILTER ACCORDION (Products Page)
 
 .newsletter-button {
   padding: 1.25rem 2.5rem;
-  background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-blue-hover) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--accent-blue) 0%,
+    var(--accent-blue-hover) 100%
+  );
   border: none;
   border-radius: 16px;
   color: white;
@@ -1741,7 +1838,11 @@ FILTER ACCORDION (Products Page)
 .footer-glow-1 {
   width: 400px;
   height: 400px;
-  background: radial-gradient(circle, rgba(0, 102, 255, 0.3) 0%, transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(0, 102, 255, 0.3) 0%,
+    transparent 70%
+  );
   top: -200px;
   left: -100px;
 }
@@ -1749,7 +1850,11 @@ FILTER ACCORDION (Products Page)
 .footer-glow-2 {
   width: 300px;
   height: 300px;
-  background: radial-gradient(circle, rgba(47, 212, 113, 0.2) 0%, transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(47, 212, 113, 0.2) 0%,
+    transparent 70%
+  );
   bottom: -150px;
   right: -50px;
 }
@@ -1803,7 +1908,7 @@ FILTER ACCORDION (Products Page)
 }
 
 .footer-links a::before {
-  content: '';
+  content: "";
   position: absolute;
   left: 0;
   top: 50%;
@@ -1877,13 +1982,17 @@ FILTER ACCORDION (Products Page)
 }
 
 .social-link::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-blue-hover) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--accent-blue) 0%,
+    var(--accent-blue-hover) 100%
+  );
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -1928,7 +2037,7 @@ FILTER ACCORDION (Products Page)
   outline: none;
   border-color: var(--glass-border);
   box-shadow: 0 0 0 3px rgba(0, 184, 148, 0.15);
-  background:var(--secondary-bg)
+  background: var(--secondary-bg);
 }
 
 .form-label {
@@ -2019,7 +2128,7 @@ FILTER ACCORDION (Products Page)
 
 .form-divider::before,
 .form-divider::after {
-  content: '';
+  content: "";
   flex: 1;
   border-bottom: 1px solid var(--glass-border);
 }
@@ -2096,7 +2205,11 @@ FILTER ACCORDION (Products Page)
   height: 100px;
   margin: 0 auto 1.25rem;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  background: linear-gradient(
+    135deg,
+    var(--accent-primary),
+    var(--accent-secondary)
+  );
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2191,8 +2304,14 @@ FILTER ACCORDION (Products Page)
 }
 
 @keyframes slideIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .form-title {
@@ -2269,11 +2388,13 @@ FILTER ACCORDION (Products Page)
 }
 
 .profile-card.loading::after {
-  content: '';
+  content: "";
   position: absolute;
-  top: 50%; left: 50%;
+  top: 50%;
+  left: 50%;
   transform: translate(-50%, -50%);
-  width: 30px; height: 30px;
+  width: 30px;
+  height: 30px;
   border: 3px solid var(--glass-border);
   border-top-color: var(--accent-primary);
   border-radius: 50%;
@@ -2281,7 +2402,9 @@ FILTER ACCORDION (Products Page)
 }
 
 @keyframes spin {
-  to { transform: translate(-50%, -50%) rotate(360deg); }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
 }
 
 /* ========================================
@@ -2294,18 +2417,16 @@ FILTER ACCORDION (Products Page)
   background: rgba(15, 15, 15, 0.85); /* Fallback + overlay */
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  
+
   /* Flex centering */
   display: flex;
   align-items: center;
   justify-content: center;
-  
+  border-radius: 16px;
+
   z-index: 1000;
   padding: 1rem;
   animation: fadeIn 0.25s ease;
-  
-  /* Prevent background scroll when modal is open */
-  overflow-y: auto;
 }
 
 .modal-card {
@@ -2315,13 +2436,15 @@ FILTER ACCORDION (Products Page)
   border-radius: 1.5rem;
   width: 100%;
   max-width: 480px;
-  padding: 2rem;
+    padding: calc(2rem + var(--safe-area-top)) 
+           calc(1rem + var(--safe-area-right)) 
+           calc(2rem + var(--safe-area-bottom)) 
+           calc(1rem + var(--safe-area-left));
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
   animation: slideUp 0.3s ease;
-  
+
   /* Ensure modal doesn't overflow viewport on small screens */
-  max-height: 90vh;
-  overflow-y: auto;
+  max-height: 90dvh;
 }
 
 .modal-header {
@@ -2378,18 +2501,22 @@ FILTER ACCORDION (Products Page)
 
 /* Animations */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideUp {
-  from { 
-    opacity: 0; 
-    transform: translateY(20px); 
+  from {
+    opacity: 0;
+    transform: translateY(20px);
   }
-  to { 
-    opacity: 1; 
-    transform: translateY(0); 
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -2400,7 +2527,7 @@ FILTER ACCORDION (Products Page)
     margin: 0.5rem;
     max-height: 95vh;
   }
-  
+
   .modal-footer {
     flex-direction: column-reverse;
   }
@@ -2421,8 +2548,14 @@ FILTER ACCORDION (Products Page)
 }
 
 @keyframes slideIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .error-message,
@@ -2463,6 +2596,7 @@ FILTER ACCORDION (Products Page)
   opacity: 1;
   visibility: visible;
   pointer-events: auto; /* Block clicks when active */
+  z-index: 104;
 }
 
 /* ========================================
@@ -2473,7 +2607,11 @@ FILTER ACCORDION (Products Page)
   top: 0;
   left: 0;
   height: 3px;
-  background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+  background: linear-gradient(
+    90deg,
+    var(--accent-primary),
+    var(--accent-secondary)
+  );
   width: 0%;
   transition: width 0.1s ease;
   z-index: 9999;
@@ -2483,8 +2621,12 @@ FILTER ACCORDION (Products Page)
 20. ANIMATIONS
 ======================================== */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes fadeInUp {
@@ -2517,71 +2659,76 @@ FILTER ACCORDION (Products Page)
     padding: 1.5rem;
     border-radius: 20px;
   }
-  
+
   .hero-content {
     grid-template-columns: 1fr;
     gap: 2rem;
   }
-  
+
   .hero-title {
     font-size: 2.5rem;
   }
-  
+
   .glass-header .search-container {
     margin-right: 1rem;
   }
-  
+
   .glass-header .action-label {
     display: none;
   }
-  
+
   .glass-header .header-action {
     min-width: 50px;
     padding: 0.75rem;
   }
-  
+
   .products-layout {
     grid-template-columns: 1fr;
   }
-  
+
   .filters-column {
     position: fixed;
     top: 0;
     left: -100%;
     width: 320px;
-    height: 100vh;
     background: var(--card-bg);
     padding: 2rem 1.5rem;
     transition: left 0.3s ease;
-    max-height: none;
+    height: 100dvh;
     border-radius: 0 20px 20px 0;
     box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+    /* ✅ Enable internal scrolling */
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
+
+    /* ✅ Prevent scroll chaining to body */
+    /*overscroll-behavior: contain; */ /*cause reaching end of filters not scroll body - do not use: we need scroll chaining*/
   }
-  
+
   .filters-column.active {
     left: 0;
-    z-index: 101;
+    z-index: 105;
   }
-  
+
   .filter-toggle {
     display: flex;
   }
-  
+
   .products-grid {
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   }
-  
+
   .category-filters {
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
   }
-  
+
   .filter-chips {
     width: 100%;
     justify-content: center;
   }
-  
+
   .categories-grid {
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   }
@@ -2592,127 +2739,126 @@ FILTER ACCORDION (Products Page)
   .products-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .newsletter-form {
     flex-direction: column;
   }
-  
+
   .footer-bottom {
     flex-direction: column;
     text-align: center;
   }
-  
+
   .footer-bottom-left {
     align-items: center;
   }
-  
+
   .social-links {
     justify-content: center;
   }
-  
+
   .main-content {
     padding: 1rem;
     border-radius: 16px;
   }
-  
+
   .glass-footer {
-    padding: 3rem 0 1.5rem;
     border-radius: 20px 20px 0 0;
   }
-  
+
   .footer-content {
     grid-template-columns: 1fr;
     gap: 2rem;
     margin: 2rem;
   }
-  
+
   .products-header {
     justify-content: center;
   }
-  
+
   .view-options {
     width: 100%;
     justify-content: center;
     flex-wrap: wrap;
   }
-  
+
   .sort-select {
     min-width: 150px;
     font-size: 0.85rem;
     padding: 0.5rem 2rem 0.5rem 0.8rem;
   }
-  
+
   .filter-toggle,
   .view-button {
     width: 36px;
     height: 36px;
     padding: 0.5rem;
   }
-  
+
   .filter-toggle svg,
   .view-button svg {
     width: 18px;
     height: 18px;
   }
-  
+
   .products-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .products-grid[data-view="list"] .product-card {
     flex-direction: column;
   }
-  
+
   .products-grid[data-view="list"] .product-image-container {
     width: 100%;
     height: 200px;
   }
-  
+
   .pagination {
     gap: 0.5rem;
     padding: 1rem;
   }
-  
+
   .pagination-button {
     padding: 0.6rem 1rem;
     font-size: 0.85rem;
   }
-  
+
   .pagination-button span {
     display: none;
   }
-  
+
   .pagination-number {
     width: 36px;
     height: 36px;
     font-size: 0.85rem;
   }
-  
+
   .page-header .section-title {
     font-size: 2rem;
   }
-  
+
   .page-header .section-subtitle {
     font-size: 1rem;
   }
-  
+
   .category-filters {
     padding: 1rem;
   }
-  
+
   .filter-chip {
     padding: 0.4rem 1rem;
     font-size: 0.85rem;
   }
-  
+
   .categories-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .categories-grid[data-view="list"] .category-card {
     flex-direction: column;
   }
-  
+
   .categories-grid[data-view="list"] .category-image {
     width: 100%;
     height: 200px;
@@ -2723,115 +2869,115 @@ FILTER ACCORDION (Products Page)
   .footer-title {
     font-size: 1rem;
   }
-  
+
   .social-link {
     width: 38px;
     height: 38px;
   }
-  
+
   .copyright {
     font-size: 0.85rem;
   }
-  
+
   .bottom-nav-link span {
     font-size: 0.7rem;
   }
-  
+
   .bottom-nav-link {
     padding: 0.6rem 0.8rem;
     min-width: 50px;
   }
-  
+
   .bottom-nav-content {
     padding: 0.6rem 0.8rem;
   }
-  
+
   .featured-products {
     padding: 1rem 0 3rem;
   }
-  
+
   .products-header {
     margin-bottom: 1.5rem;
   }
-  
+
   .view-options {
     gap: 0.5rem;
     padding: 0.4rem;
   }
-  
+
   .filter-toggle,
   .view-button {
     width: 32px;
     height: 32px;
   }
-  
+
   .sort-select {
     min-width: 130px;
     font-size: 0.8rem;
     padding: 0.45rem 1.8rem 0.45rem 0.7rem;
   }
-  
+
   .filter-section h3 {
     font-size: 1rem;
   }
-  
+
   .filter-option {
     font-size: 0.85rem;
     padding: 0.3rem 0.5rem;
   }
-  
+
   .product-title {
     font-size: 1.05rem;
   }
-  
+
   .product-price {
     font-size: 1.3rem;
   }
-  
+
   .product-info {
     padding: 1.25rem;
   }
-  
+
   .product-actions {
     gap: 0.5rem;
   }
-  
+
   .wishlist-button,
   .add-to-cart {
     padding: 0.75rem;
     font-size: 0.8rem;
   }
-  
+
   .page-header {
     padding: 1.5rem 0;
     margin-bottom: 2rem;
   }
-  
+
   .category-filters {
     padding: 0.75rem;
   }
-  
+
   .filter-chips {
     gap: 0.4rem;
   }
-  
+
   .filter-chip {
     padding: 0.35rem 0.85rem;
     font-size: 0.8rem;
   }
-  
+
   .view-toggle {
     padding: 0.2rem;
   }
-  
+
   .view-btn {
     padding: 0.4rem;
   }
-  
+
   .category-title {
     font-size: 1.25rem;
   }
-  
+
   .category-info {
     padding: 1.5rem;
   }
@@ -3288,7 +3434,9 @@ RELATED PRODUCTS - HORIZONTAL CAROUSEL
   display: flex;
   flex-direction: column;
   height: 100%;
-  transition: transform 0.3s, box-shadow 0.3s;
+  transition:
+    transform 0.3s,
+    box-shadow 0.3s;
 }
 
 .related-product-card:hover {
@@ -3499,61 +3647,61 @@ RESPONSIVE ADJUSTMENTS
   .product-detail {
     padding: 2.5rem 0;
   }
-  
+
   .product-detail .product-title {
     font-size: 1.75rem;
     margin-bottom: 1.5rem;
   }
-  
+
   .product-gallery {
     position: relative;
     top: 0;
   }
-  
+
   .thumbnail {
     flex: 0 0 60px;
     width: 60px;
     height: 60px;
   }
-  
+
   .product-info .product-details {
     padding: 1rem;
   }
-  
+
   .product-info .detail-label {
     font-size: 0.9rem;
   }
-  
+
   .product-info .detail-value {
     font-size: 0.9rem;
   }
-  
+
   /* Related products - mobile */
   .related-products-section {
     padding: 3rem 0;
   }
-  
+
   .related-product-card {
     flex: 0 0 200px;
   }
-  
+
   .related-product-card .product-info {
     padding: 1rem;
   }
-  
+
   .related-product-card .product-title {
     font-size: 1rem;
   }
-  
+
   .related-product-card .product-price {
     font-size: 1.1rem;
   }
-  
+
   .carousel-nav {
     width: 40px;
     height: 40px;
   }
-  
+
   .carousel-nav svg {
     width: 18px;
     height: 18px;
@@ -3564,33 +3712,32 @@ RESPONSIVE ADJUSTMENTS
   .product-detail .product-title {
     font-size: 1.5rem;
   }
-  
+
   .product-info .product-price h2 {
     font-size: 1.75rem;
   }
-  
+
   .related-product-card {
     flex: 0 0 160px;
   }
-  
+
   .related-product-card .product-info {
     padding: 0.75rem;
   }
-  
+
   .related-product-card .product-title {
     font-size: 0.95rem;
   }
-  
+
   .related-product-card .product-price {
     font-size: 1rem;
   }
-  
+
   .related-product-card .product-description {
     font-size: 0.85rem;
     -webkit-line-clamp: 3;
   }
 }
-
 
 /* ========================================
 CART PAGE
@@ -3668,11 +3815,17 @@ CART PAGE
   color: var(--text-secondary);
 }
 
-.cart-items-header span:nth-child(1) { justify-self: start; }
+.cart-items-header span:nth-child(1) {
+  justify-self: start;
+}
 .cart-items-header span:nth-child(2),
 .cart-items-header span:nth-child(3),
-.cart-items-header span:nth-child(4) { justify-self: center; }
-.cart-items-header span:nth-child(5) { justify-self: end; }
+.cart-items-header span:nth-child(4) {
+  justify-self: center;
+}
+.cart-items-header span:nth-child(5) {
+  justify-self: end;
+}
 
 #cartItemsList {
   display: flex;
@@ -3869,7 +4022,7 @@ CART PAGE
   .cart-items-header {
     display: none;
   }
-  
+
   .cart-item {
     grid-template-columns: 1fr;
     grid-template-areas:
@@ -3882,39 +4035,39 @@ CART PAGE
     gap: 1rem;
     padding: 1.5rem;
   }
-  
+
   .cart-item-image {
     grid-area: image;
     justify-self: center;
   }
-  
+
   .cart-item-details {
     grid-area: details;
     text-align: center;
   }
-  
+
   .cart-item-price {
     grid-area: price;
     justify-self: center;
     font-size: 1.1rem;
   }
-  
+
   .cart-item-quantity {
     grid-area: quantity;
     justify-self: center;
   }
-  
+
   .cart-item-total {
     grid-area: total;
     justify-self: center;
     font-size: 1.1rem;
   }
-  
+
   .cart-item-remove {
     grid-area: remove;
     justify-self: center;
   }
-  
+
   .cart-summary {
     position: relative;
     top: 0;
@@ -3925,20 +4078,20 @@ CART PAGE
   .cart-page {
     padding: 2.5rem 0;
   }
-  
+
   .cart-header .section-title {
     font-size: 2rem;
   }
-  
+
   .cart-item-image {
     width: 70px;
     height: 70px;
   }
-  
+
   .quantity-input {
     width: 42px;
   }
-  
+
   .quantity-btn {
     width: 24px;
     height: 24px;
@@ -3947,11 +4100,245 @@ CART PAGE
 }
 
 /* ========================================
+PAYMENT METHODS - Cart Page
+======================================== */
+.payment-methods {
+  margin-top: 1.5rem;
+}
+
+.payment-option {
+  margin-bottom: 0.75rem;
+}
+
+.payment-option input[type="radio"] {
+  display: none; /* Hide default radio */
+}
+
+.payment-option label {
+  display: block;
+  padding: 1rem;
+  background: var(--glass-bg);
+  border: 2px solid var(--border-color);
+  border-radius: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.payment-option label:hover {
+  border-color: var(--accent-blue);
+}
+
+.payment-option input[type="radio"]:checked + label {
+  border-color: var(--accent-blue);
+  background: rgba(0, 102, 255, 0.05);
+  box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
+}
+
+.payment-option-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.payment-icon {
+  font-size: 1.5rem;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--card-bg);
+  border-radius: 0.5rem;
+}
+
+.payment-option strong {
+  color: var(--text-primary);
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.payment-option .text-secondary {
+  font-size: 0.85rem;
+}
+
+/* Card Details Form */
+.card-details-form {
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .form-row {
+    grid-template-columns: 1fr !important;
+  }
+
+  .payment-option-content {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+/* ========================================
+ADDRESSES SECTION - Profile Page
+======================================== */
+.addresses-section {
+  margin-top: 1.5rem;
+}
+
+.addresses-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.addresses-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.address-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 1rem;
+  padding: 1.25rem;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.address-card:hover {
+  border-color: var(--accent-blue);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.address-card.default {
+  border-color: var(--accent-blue);
+  background: rgba(0, 102, 255, 0.03);
+}
+
+.address-card .default-badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: var(--accent-blue);
+  color: white;
+  font-size: 0.7rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 1rem;
+  font-weight: 600;
+}
+
+.address-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.address-card-title {
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.address-card-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.address-card-actions button {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.address-card-actions button:hover {
+  background: var(--accent-blue);
+  border-color: var(--accent-blue);
+  color: white;
+}
+
+.address-card-actions button.delete-btn:hover {
+  background: #ff4444;
+  border-color: #ff4444;
+}
+
+.address-card-body {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.address-card-body p {
+  margin: 0.25rem 0;
+}
+
+.address-card-body strong {
+  color: var(--text-primary);
+}
+
+/* Modal adjustments for address form */
+#addressModal .modal-card {
+  max-width: 800px;
+  overflow-y: scroll;
+}
+
+#addressModal .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  #addressModal .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .addresses-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .address-card-header {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .address-card-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+
+/* ========================================
 Z-INDEX REFERENCE
 ========================================
 1001: action-badge (highest)
 999:  floating bottom nav, header
-101:  main-content, glass-footer, filters-column.active
-100: filters-overlay
+105:  filters-column.active
+104: filters-overlay.active
+101:  main-content, glass-footer,
+
 1:   product-tag, toggle-password
 ======================================== */

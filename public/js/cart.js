@@ -693,3 +693,47 @@ if (!document.getElementById('cart-toast-styles')) {
   `;
   document.head.appendChild(style);
 }
+
+// ========================================
+// PAYMENT METHOD TOGGLE
+// ========================================
+document.addEventListener('DOMContentLoaded', () => {
+  const paymentRadios = document.querySelectorAll('input[name="payment-method"]');
+  const cardDetailsForm = document.getElementById('card-details-form');
+  
+  function toggleCardForm() {
+    const selected = document.querySelector('input[name="payment-method"]:checked')?.value;
+    if (cardDetailsForm) {
+      cardDetailsForm.style.display = selected === 'card' ? 'block' : 'none';
+    }
+  }
+  
+  paymentRadios.forEach(radio => {
+    radio.addEventListener('change', toggleCardForm);
+  });
+  
+  // Initialize on load
+  toggleCardForm();
+  
+  // Format card number with spaces (basic UX enhancement)
+  const cardNumberInput = document.getElementById('card-number');
+  if (cardNumberInput) {
+    cardNumberInput.addEventListener('input', (e) => {
+      let value = e.target.value.replace(/\D/g, ''); // Remove non-digits
+      value = value.replace(/(.{4})/g, '$1 ').trim(); // Add space every 4 digits
+      e.target.value = value;
+    });
+  }
+  
+  // Format expiry date as MM/YY
+  const expiryInput = document.getElementById('card-expiry');
+  if (expiryInput) {
+    expiryInput.addEventListener('input', (e) => {
+      let value = e.target.value.replace(/\D/g, '');
+      if (value.length >= 2) {
+        value = value.slice(0, 2) + '/' + value.slice(2, 4);
+      }
+      e.target.value = value;
+    });
+  }
+});

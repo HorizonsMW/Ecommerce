@@ -11,7 +11,8 @@
 
         <!-- Empty Cart State -->
         <div id="emptyCart" class="empty-cart" style="display: none;">
-            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin: 0 auto 1.5rem; opacity: 0.5;">
+            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                style="margin: 0 auto 1.5rem; opacity: 0.5;">
                 <circle cx="9" cy="21" r="1"></circle>
                 <circle cx="20" cy="21" r="1"></circle>
                 <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
@@ -43,7 +44,7 @@
                 <!-- Cart Summary -->
                 <div class="cart-summary">
                     <h3>Order Summary</h3>
-                    
+
                     <div class="summary-row">
                         <span>Subtotal</span>
                         <span id="subtotalAmount">$0.00</span>
@@ -56,16 +57,98 @@
                         <span>Tax</span>
                         <span id="taxAmount">Calculated at checkout</span>
                     </div>
-                    
+
                     <div class="summary-total">
                         <span>Total</span>
                         <span id="totalAmount">$0.00</span>
                     </div>
-                    
+
+                    <!-- Payment Method Selection -->
+                    <div class="payment-methods">
+                        <h4 style="margin: 1.5rem 0 1rem; color: var(--text-primary);">Payment Method</h4>
+
+                        <div class="payment-option">
+                            <input type="radio" id="payment-card" name="payment-method" value="card" checked>
+                            <label for="payment-card">
+                                <div class="payment-option-content">
+                                    <div class="payment-icon">💳</div>
+                                    <div>
+                                        <strong>Credit/Debit Card</strong>
+                                        <p class="text-secondary" style="font-size: 0.85rem; margin: 0.25rem 0 0;">Visa,
+                                            Mastercard, Amex</p>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="payment-option">
+                            <input type="radio" id="payment-paypal" name="payment-method" value="paypal">
+                            <label for="payment-paypal">
+                                <div class="payment-option-content">
+                                    <div class="payment-icon">🅿️</div>
+                                    <div>
+                                        <strong>PayPal</strong>
+                                        <p class="text-secondary" style="font-size: 0.85rem; margin: 0.25rem 0 0;">
+                                            Secure PayPal checkout</p>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="payment-option">
+                            <input type="radio" id="payment-cod" name="payment-method" value="cod">
+                            <label for="payment-cod">
+                                <div class="payment-option-content">
+                                    <div class="payment-icon">💵</div>
+                                    <div>
+                                        <strong>Cash on Delivery</strong>
+                                        <p class="text-secondary" style="font-size: 0.85rem; margin: 0.25rem 0 0;">Pay
+                                            when you receive</p>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Card Details Form (Only shown when "Card" is selected) -->
+                    <div id="card-details-form" class="card-details-form"
+                        style="display: block; margin-top: 1.5rem; padding: 1.25rem; background: var(--glass-bg); border-radius: 1rem; border: 1px solid var(--border-color);">
+                        <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div>
+                                <label class="form-label" for="card-number">Card Number</label>
+                                <input type="text" id="card-number" class="input-field"
+                                    placeholder="1234 5678 9012 3456" maxlength="19" inputmode="numeric">
+                            </div>
+                            <div>
+                                <label class="form-label" for="card-name">Name on Card</label>
+                                <input type="text" id="card-name" class="input-field" placeholder="John Doe">
+                            </div>
+                        </div>
+
+                        <div class="form-row"
+                            style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                            <div>
+                                <label class="form-label" for="card-expiry">Expiry Date</label>
+                                <input type="text" id="card-expiry" class="input-field" placeholder="MM/YY"
+                                    maxlength="5" inputmode="numeric">
+                            </div>
+                            <div>
+                                <label class="form-label" for="card-cvc">CVC</label>
+                                <input type="text" id="card-cvc" class="input-field" placeholder="123" maxlength="4"
+                                    inputmode="numeric">
+                            </div>
+                        </div>
+
+                        <p class="text-secondary"
+                            style="font-size: 0.8rem; margin-top: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                            🔒 Your payment details are encrypted and never stored on our servers.
+                        </p>
+                    </div>
+
                     <button id="checkoutBtn" class="cta-button" style="width: 100%; margin-top: 1.5rem;">
                         Proceed to Checkout
                     </button>
-                    
+
                     <p class="text-secondary" style="font-size: 0.85rem; margin-top: 1rem; text-align: center;">
                         🔒 Secure checkout • Free returns
                     </p>
