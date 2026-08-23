@@ -4,7 +4,7 @@ const { default: mongoose } = require("mongoose");
 //the dev that an id does not exist
 const validateMongoDbId = (id) => {
     const isValid = mongoose.Types.ObjectId.isValid(id);
-    console.log(id);
+    //console.log(id);
     console.log(isValid);
     
     if (!isValid) throw new Error("This id is not valid or was not found");

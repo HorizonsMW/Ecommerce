@@ -352,4 +352,84 @@ router.delete('/:productId', isLoggedIn, async (req, res) => {
   }
 });
 
+// ========================================
+// CHECKOUT WEB ROUTE
+// ========================================
+
+// GET /cart/checkout - Render checkout page
+router.get('/checkout', isLoggedIn, async (req, res) => {
+  try {
+    // Fetch user with cart and addresses for pre-fill
+    const user = await User.findById(req.user._id)
+      .select('firstname lastname email mobile address cart')
+      .lean();
+    
+    // Fetch cart items with product details (reuse /items logic)
+    const cartItems = Array.isArray(user?.cart) ? user.cart : [];
+    
+    if (cartItems.length === 0) {
+      // Redirect to cart if empty
+      return res.redirect('/cart');
+    }
+    
+    // Populate product details
+    const populatedCart = await Promise.all(
+      cartItems.map(async (cartItem) => {
+        const productId = cartItem.productId?.$oid || cartItem.productId || cartItem;
+        const product = await Product.findById(productId)
+          .select('title price images brand color quantity');
+        
+        return {
+          _id: cartItem._id?.toString?.() || null,
+          productId: productId?.toString?.() || productId,
+          quantity: cartItem.quantity || 1,
+          price: cartItem.price || product?.price || 0,
+          title: cartItem.title || product?.title || 'Unknown',
+          image: cartItem.image || product?.images?.[0] || null,
+          brand: cartItem.brand || product?.brand || '',
+          color: cartItem.color || product?.color || '',
+          availableStock: product?.quantity || 0
+        };
+      })
+    );
+    
+    // Calculate totals
+    const subtotal = populatedCart.reduce(
+      (sum, item) => sum + (item.price * item.quantity), 0
+    );
+    const shipping = 0; // Free shipping for demo
+    const tax = subtotal * 0.08; // 8% tax for demo
+    const total = subtotal + shipping + tax;
+    
+    // Get default address for pre-fill
+    const defaultAddress = user.address?.find(addr => addr.isDefault) || user.address?.[0];
+    
+    res.render('pages/checkout', {
+      title: 'Checkout',
+      layout: 'layouts/main',
+      user: {
+        firstname: user.firstname,
+        lastname: user.lastname,
+        email: user.email,
+        mobile: user.mobile
+      },
+      addresses: user.address || [],
+      defaultAddress,
+      cartItems: populatedCart,
+      subtotal,
+      shipping,
+      tax,
+      total
+    });
+    
+  } catch (error) {
+    console.error('Error rendering checkout:', error);
+    res.status(500).render('pages/error', {
+      title: 'Error',
+      message: 'Failed to load checkout page',
+      layout: 'layouts/main'
+    });
+  }
+});
+
 module.exports = router;

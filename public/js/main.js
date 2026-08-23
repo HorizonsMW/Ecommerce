@@ -570,9 +570,6 @@ window.addEventListener("scroll", () => {
 // ========================================
 // CART FUNCTIONALITY - GLOBAL (main.js)
 // ========================================
-// ========================================
-// CART FUNCTIONALITY - GLOBAL (main.js)
-// ========================================
 
 /**
  * Add product to cart with visual feedback

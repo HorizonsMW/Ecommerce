@@ -1,0 +1,722 @@
+<% if (typeof user==='undefined' || !user) { %>
+    <script>
+        window.location.href = '/user/login?redirect=' + encodeURIComponent(window.location.pathname);
+    </script>
+    <% } %>
+
+        <section class="checkout-section">
+            <div class="container">
+                <!-- Page Header -->
+                <div class="checkout-header">
+                    <h1 class="section-title">Checkout</h1>
+                    <p class="section-subtitle">Review your order and complete your purchase</p>
+                </div>
+
+                <!-- Checkout Steps Indicator -->
+                <div class="checkout-steps">
+                    <div class="step active">
+                        <span class="step-number">1</span>
+                        <span class="step-label">Cart</span>
+                    </div>
+                    <div class="step active">
+                        <span class="step-number">2</span>
+                        <span class="step-label">Checkout</span>
+                    </div>
+                    <div class="step">
+                        <span class="step-number">3</span>
+                        <span class="step-label">Confirmation</span>
+                    </div>
+                </div>
+
+                <!-- Checkout Grid -->
+                <div class="checkout-grid">
+
+                    <!-- Left Column: Checkout Form -->
+                    <div class="checkout-form-column">
+
+                        <!-- Shipping Address -->
+                        <div class="checkout-card">
+                            <h3 class="form-title">📍 Shipping Address</h3>
+
+                            <!-- Address Selection -->
+                            <% if (addresses && addresses.length> 0) { %>
+                                <div class="address-selection">
+                                    <% addresses.forEach((addr, index)=> { %>
+                                        <label class="address-option <%= addr.isDefault ? 'selected' : '' %>">
+                                            <input type="radio" name="shippingAddress" value="<%= addr._id %>"
+                                                <%=addr.isDefault ? 'checked' : '' %>
+                                            data-address='<%= JSON.stringify(addr).replace(/'/g, "\\'" ) %>'>
+                                                <div class="address-option-content">
+                                                    <div class="address-option-header">
+                                                        <strong>
+                                                            <%= addr.label || 'Address' %>
+                                                        </strong>
+                                                        <% if (addr.isDefault) { %>
+                                                            <span class="default-badge">Default</span>
+                                                            <% } %>
+                                                    </div>
+                                                    <p class="address-option-body">
+                                                        <%= addr.name %><br>
+                                                            <%= addr.line1 %>
+                                                                <% if (addr.line2) { %>, <%= addr.line2 %>
+                                                                        <% } %><br>
+                                                                            <%= addr.city %>, <%= addr.state %>
+                                                                                    <%= addr.postal %><br>
+                                                                                        <%= addr.country %><br>
+                                                                                            📱 <%= addr.phone %>
+                                                    </p>
+                                                </div>
+                                        </label>
+                                        <% }); %>
+                                </div>
+
+                                <!-- ✅ Simple button that reuses addresses.js logic -->
+                                <button type="button" class="cta-button cta-secondary" id="checkoutAddAddressBtn"
+                                    style="margin-top: 1rem; width: 100%;" data-checkout-context="true">
+                                    + Add New Address
+                                </button>
+                                <% } else { %>
+                                    <p class="text-secondary">No saved addresses found.</p>
+                                    <button type="button" class="cta-button" id="addNewAddressBtn"
+                                        style="margin-top: 1rem; width: 100%;">
+                                        + Add New Address
+                                    </button>
+                                    <% } %>
+
+                                        <!-- Manual Address Form (Hidden by Default) -->
+                                        <div id="manualAddressForm" class="manual-address-form"
+                                            style="display: none; margin-top: 1.5rem;">
+                                            <div class="form-row">
+                                                <div class="form-group">
+                                                    <label class="form-label" for="manualName">Full Name *</label>
+                                                    <input type="text" id="manualName" class="input-field"
+                                                        value="<%= user.firstname %> <%= user.lastname %>" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="form-label" for="manualPhone">Phone *</label>
+                                                    <input type="tel" id="manualPhone" class="input-field"
+                                                        value="<%= user.mobile %>" required>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="form-label" for="manualLine1">Address Line 1 *</label>
+                                                <input type="text" id="manualLine1" class="input-field" required>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="form-label" for="manualLine2">Address Line 2</label>
+                                                <input type="text" id="manualLine2" class="input-field">
+                                            </div>
+
+                                            <div class="form-row">
+                                                <div class="form-group">
+                                                    <label class="form-label" for="manualCity">City *</label>
+                                                    <input type="text" id="manualCity" class="input-field" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="form-label" for="manualState">State/Province *</label>
+                                                    <input type="text" id="manualState" class="input-field" required>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-row">
+                                                <div class="form-group">
+                                                    <label class="form-label" for="manualPostal">Postal Code *</label>
+                                                    <input type="text" id="manualPostal" class="input-field" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="form-label" for="manualCountry">Country *</label>
+                                                    <input type="text" id="manualCountry" class="input-field"
+                                                        value="United States" required>
+                                                </div>
+                                            </div>
+
+                                            <label class="remember-me" style="margin-top: 1rem;">
+                                                <input type="checkbox" id="saveNewAddress">
+                                                <span>Save this address for future orders</span>
+                                            </label>
+                                        </div>
+                        </div>
+
+                        <!-- Payment Method -->
+                        <div class="checkout-card">
+                            <h3 class="form-title">💳 Payment Method</h3>
+
+                            <div class="payment-methods">
+                                <div class="payment-option">
+                                    <input type="radio" id="payment-card" name="payment-method" value="card" checked>
+                                    <label for="payment-card">
+                                        <div class="payment-option-content">
+                                            <div class="payment-icon">💳</div>
+                                            <div>
+                                                <strong>Credit/Debit Card</strong>
+                                                <p class="text-secondary"
+                                                    style="font-size: 0.85rem; margin: 0.25rem 0 0;">
+                                                    Visa, Mastercard, Amex
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+
+                                <div class="payment-option">
+                                    <input type="radio" id="payment-paypal" name="payment-method" value="paypal">
+                                    <label for="payment-paypal">
+                                        <div class="payment-option-content">
+                                            <div class="payment-icon">🅿️</div>
+                                            <div>
+                                                <strong>PayPal</strong>
+                                                <p class="text-secondary"
+                                                    style="font-size: 0.85rem; margin: 0.25rem 0 0;">
+                                                    Secure PayPal checkout
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+
+                                <div class="payment-option">
+                                    <input type="radio" id="payment-cod" name="payment-method" value="cod">
+                                    <label for="payment-cod">
+                                        <div class="payment-option-content">
+                                            <div class="payment-icon">💵</div>
+                                            <div>
+                                                <strong>Cash on Delivery</strong>
+                                                <p class="text-secondary"
+                                                    style="font-size: 0.85rem; margin: 0.25rem 0 0;">
+                                                    Pay when you receive
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Card Details Form (Only shown when "Card" is selected) -->
+                            <div id="card-details-form" class="card-details-form" style="display: block; margin-top: 1.5rem; padding: 1.25rem; 
+                               background: var(--glass-bg); border-radius: 1rem; 
+                               border: 1px solid var(--border-color);">
+                                <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                    <div>
+                                        <label class="form-label" for="card-number">Card Number</label>
+                                        <input type="text" id="card-number" class="input-field"
+                                            placeholder="1234 5678 9012 3456" maxlength="19" inputmode="numeric">
+                                    </div>
+                                    <div>
+                                        <label class="form-label" for="card-name">Name on Card</label>
+                                        <input type="text" id="card-name" class="input-field" placeholder="John Doe">
+                                    </div>
+                                </div>
+
+                                <div class="form-row"
+                                    style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                                    <div>
+                                        <label class="form-label" for="card-expiry">Expiry Date</label>
+                                        <input type="text" id="card-expiry" class="input-field" placeholder="MM/YY"
+                                            maxlength="5" inputmode="numeric">
+                                    </div>
+                                    <div>
+                                        <label class="form-label" for="card-cvc">CVC</label>
+                                        <input type="text" id="card-cvc" class="input-field" placeholder="123"
+                                            maxlength="4" inputmode="numeric">
+                                    </div>
+                                </div>
+
+                                <p class="text-secondary" style="font-size: 0.8rem; margin-top: 1rem; 
+                            display: flex; align-items: center; gap: 0.5rem;">
+                                    🔒 Your payment details are encrypted and never stored on our servers
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Order Notes (Optional) -->
+                        <div class="checkout-card">
+                            <h3 class="form-title">📝 Order Notes (Optional)</h3>
+                            <textarea id="orderNotes" class="input-field" rows="3"
+                                placeholder="Special instructions for delivery..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Order Summary -->
+                    <div class="checkout-summary-column">
+                        <div class="checkout-summary">
+                            <h3>Order Summary</h3>
+
+                            <!-- Cart Items -->
+                            <div class="summary-items">
+                                <% cartItems.forEach(item=> { %>
+                                    <div class="summary-item">
+                                        <div class="summary-item-image">
+                                            <% if (item.image) { %>
+                                                <img src="<%= item.image %>" alt="<%= item.title %>"
+                                                    style="width: 60px; height: 60px; object-fit: contain;">
+                                                <% } else { %>
+                                                    <div style="width: 60px; height: 60px; background: var(--glass-bg); 
+                                            border-radius: 0.5rem; display: flex; align-items: center; 
+                                            justify-content: center; color: var(--text-secondary);">
+                                                        No Image
+                                                    </div>
+                                                    <% } %>
+                                        </div>
+                                        <div class="summary-item-details">
+                                            <h4 class="summary-item-title">
+                                                <%= item.title %>
+                                            </h4>
+                                            <p class="summary-item-meta">
+                                                <%= item.brand %> • <%= item.color %>
+                                            </p>
+                                            <p class="summary-item-quantity">
+                                                Qty: <%= item.quantity %> × $<%= item.price.toFixed(2) %>
+                                            </p>
+                                        </div>
+                                        <div class="summary-item-price">
+                                            $<%= (item.price * item.quantity).toFixed(2) %>
+                                        </div>
+                                    </div>
+                                    <% }); %>
+                            </div>
+
+                            <!-- Totals -->
+                            <div class="summary-totals">
+                                <div class="summary-row">
+                                    <span>Subtotal</span>
+                                    <span id="subtotalAmount">$<%= subtotal.toFixed(2) %></span>
+                                </div>
+                                <div class="summary-row">
+                                    <span>Shipping</span>
+                                    <span id="shippingAmount">
+                                        <%= shipping===0 ? 'Free' : '$' + shipping.toFixed(2) %>
+                                    </span>
+                                </div>
+                                <div class="summary-row">
+                                    <span>Tax (8%)</span>
+                                    <span id="taxAmount">$<%= tax.toFixed(2) %></span>
+                                </div>
+
+                                <div class="summary-total">
+                                    <span>Total</span>
+                                    <span id="totalAmount">$<%= total.toFixed(2) %></span>
+                                </div>
+                            </div>
+
+                            <!-- Place Order Button -->
+                            <button id="placeOrderBtn" class="cta-button" style="width: 100%; margin-top: 1.5rem;">
+                                🚀 Place Order
+                            </button>
+
+                            <p class="text-secondary" style="font-size: 0.85rem; margin-top: 1rem; text-align: center;">
+                                🔒 Secure checkout • Free returns • 30-day guarantee
+                            </p>
+
+                            <!-- Coming Soon Overlay (Demo Mode) -->
+                            <div id="comingSoonOverlay" class="coming-soon-overlay" style="display: none;">
+                                <div class="coming-soon-content">
+                                    <h4>🚧 Checkout Coming Soon!</h4>
+                                    <p>Payment processing is being integrated. For demo purposes, your order has been
+                                        saved.</p>
+                                    <button class="cta-button" id="continueToConfirmation">
+                                        Continue to Confirmation →
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- ✅ Reuse Profile's Address Modal (same ID = same modal) -->
+            <div id="addressModal" class="modal-overlay" style="display: none;">
+                <div class="modal-card">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="addressModalTitle">Add New Address</h4>
+                        <button class="modal-close" id="closeAddressModal" aria-label="Close">&times;</button>
+                    </div>
+
+                    <div class="modal-body">
+                        <form id="addressForm">
+                            <input type="hidden" id="addressId">
+
+                            <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                <div>
+                                    <label class="form-label" for="addressLabel">Label (e.g., Home, Work)</label>
+                                    <input type="text" id="addressLabel" class="input-field" placeholder="Home"
+                                        required>
+                                </div>
+                                <div>
+                                    <label class="form-label" for="addressName">Full Name</label>
+                                    <input type="text" id="addressName" class="input-field" placeholder="John Doe"
+                                        required>
+                                </div>
+                            </div>
+
+                            <div class="form-group" style="margin-top: 1rem;">
+                                <label class="form-label" for="addressLine1">Address Line 1</label>
+                                <input type="text" id="addressLine1" class="input-field" placeholder="123 Main St"
+                                    required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="addressLine2">Address Line 2 (Optional)</label>
+                                <input type="text" id="addressLine2" class="input-field" placeholder="Apt 4B">
+                            </div>
+
+                            <div class="form-row"
+                                style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                                <div>
+                                    <label class="form-label" for="addressCity">City</label>
+                                    <input type="text" id="addressCity" class="input-field" placeholder="New York"
+                                        required>
+                                </div>
+                                <div>
+                                    <label class="form-label" for="addressState">State/Province</label>
+                                    <input type="text" id="addressState" class="input-field" placeholder="NY" required>
+                                </div>
+                            </div>
+
+                            <div class="form-row"
+                                style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                                <div>
+                                    <label class="form-label" for="addressPostal">Postal Code</label>
+                                    <input type="text" id="addressPostal" class="input-field" placeholder="10001"
+                                        required>
+                                </div>
+                                <div>
+                                    <label class="form-label" for="addressCountry">Country</label>
+                                    <input type="text" id="addressCountry" class="input-field"
+                                        placeholder="United States" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group" style="margin-top: 1rem;">
+                                <label class="form-label" for="addressPhone">Phone Number</label>
+                                <input type="tel" id="addressPhone" class="input-field" placeholder="+1 234 567 8900"
+                                    required>
+                            </div>
+
+                            <div class="form-options" style="margin-top: 1.5rem;">
+                                <label class="remember-me">
+                                    <input type="checkbox" id="addressDefault" checked>
+                                    <span>Use as shipping address for this order</span>
+                                </label>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="cta-button cta-secondary" id="cancelAddressModal">
+                            Cancel
+                        </button>
+                        <button type="button" class="cta-button" id="saveAddressBtn">
+                            <span class="btn-text">Save & Use Address</span>
+                            <span class="btn-loader" style="display: none;">Saving...</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ✅ Reuse Password Verification Modal (same ID = same modal) -->
+            <div id="passwordModal" class="modal-overlay" style="display: none;">
+                <div class="modal-card">
+                    <div class="modal-header">
+                        <h4 class="modal-title">🔐 Confirm Your Identity</h4>
+                        <button class="modal-close" id="closePasswordModal" aria-label="Close">&times;</button>
+                    </div>
+
+                    <div class="modal-body">
+                        <p class="modal-description">
+                            For security, please enter your password to add a new address.
+                        </p>
+
+                        <div id="passwordError" class="error-message" style="display: none;"></div>
+
+                        <div class="form-group">
+                            <label for="verifyPassword" class="form-label">Current Password</label>
+                            <div class="password-wrapper">
+                                <input type="password" id="verifyPassword" name="password" class="input-field" required
+                                    placeholder="••••••••" autocomplete="current-password">
+                                <button type="button" class="toggle-password" id="toggleVerifyPassword"
+                                    aria-label="Toggle password visibility">👁️</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="cta-button cta-secondary" id="cancelPasswordVerify">
+                            Cancel
+                        </button>
+                        <button type="button" class="cta-button" id="confirmPasswordVerify">
+                            <span class="btn-text">Confirm & Save</span>
+                            <span class="btn-loader" style="display: none;">Verifying...</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- JavaScript: Checkout Logic -->
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                // 🔐 Auth helper
+                const getAuthHeaders = () => {
+                    const token = localStorage.getItem('jwtToken') || sessionStorage.getItem('jwtToken');
+                    return {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        ...(token && { 'Authorization': `Bearer ${token}` })
+                    };
+                };
+
+                const API_BASE = `http://${window.location.hostname}:4000/api`;
+
+                // DOM Elements
+                const useDifferentAddressBtn = document.getElementById('useDifferentAddressBtn');
+                const addNewAddressBtn = document.getElementById('addNewAddressBtn');
+                const manualAddressForm = document.getElementById('manualAddressForm');
+                const cardDetailsForm = document.getElementById('card-details-form');
+                const paymentRadios = document.querySelectorAll('input[name="payment-method"]');
+                const placeOrderBtn = document.getElementById('placeOrderBtn');
+                const comingSoonOverlay = document.getElementById('comingSoonOverlay');
+                const continueToConfirmation = document.getElementById('continueToConfirmation');
+
+                // Toggle manual address form
+                if (useDifferentAddressBtn) {
+                    useDifferentAddressBtn.addEventListener('click', () => {
+                        if (manualAddressForm.style.display === 'none') {
+                            manualAddressForm.style.display = 'block';
+                            useDifferentAddressBtn.textContent = '← Use Saved Address';
+                        } else {
+                            manualAddressForm.style.display = 'none';
+                            useDifferentAddressBtn.textContent = '+ Use Different Address';
+                        }
+                    });
+                }
+
+                if (addNewAddressBtn) {
+                    addNewAddressBtn.addEventListener('click', () => {
+                        manualAddressForm.style.display = 'block';
+                        if (useDifferentAddressBtn) {
+                            useDifferentAddressBtn.style.display = 'none';
+                        }
+                    });
+                }
+
+                // Toggle card details form based on payment method
+                paymentRadios.forEach(radio => {
+                    radio.addEventListener('change', () => {
+                        if (cardDetailsForm) {
+                            cardDetailsForm.style.display = radio.value === 'card' ? 'block' : 'none';
+                        }
+                    });
+                });
+
+                // Format card number with spaces
+                const cardNumberInput = document.getElementById('card-number');
+                if (cardNumberInput) {
+                    cardNumberInput.addEventListener('input', (e) => {
+                        let value = e.target.value.replace(/\D/g, '');
+                        value = value.replace(/(.{4})/g, '$1 ').trim();
+                        e.target.value = value;
+                    });
+                }
+
+                // Format expiry date as MM/YY
+                const expiryInput = document.getElementById('card-expiry');
+                if (expiryInput) {
+                    expiryInput.addEventListener('input', (e) => {
+                        let value = e.target.value.replace(/\D/g, '');
+                        if (value.length >= 2) {
+                            value = value.slice(0, 2) + '/' + value.slice(2, 4);
+                        }
+                        e.target.value = value;
+                    });
+                }
+
+                // Place Order Button Handler
+                if (placeOrderBtn) {
+                    placeOrderBtn.addEventListener('click', async () => {
+                        // Show "Coming Soon" overlay for demo
+                        if (comingSoonOverlay) {
+                            comingSoonOverlay.style.display = 'flex';
+                        }
+                    });
+                }
+
+                // Continue to Confirmation (Demo Flow)
+                if (continueToConfirmation) {
+                    continueToConfirmation.addEventListener('click', () => {
+                        // In a real app, this would redirect to order confirmation
+                        // For demo, show success message and clear cart
+                        alert('🎉 Order placed successfully! (Demo mode)');
+
+                        // Clear cart from localStorage for guest users
+                        if (!localStorage.getItem('jwtToken') && !sessionStorage.getItem('jwtToken')) {
+                            localStorage.removeItem('cart');
+                        }
+
+                        // Redirect to home or order confirmation
+                        window.location.href = '/';
+                    });
+                }
+
+                // Pre-fill manual form if default address exists
+                if (manualAddressForm && <%= defaultAddress ? JSON.stringify(defaultAddress).replace(/'/g, "\\'") : 'null' %>) {
+                const defaultAddr = <%= defaultAddress ?JSON.stringify(defaultAddress) : 'null' %>;
+                if (defaultAddr) {
+                    document.getElementById('manualName')?.value = defaultAddr.name || '';
+                    document.getElementById('manualPhone')?.value = defaultAddr.phone || '';
+                    document.getElementById('manualLine1')?.value = defaultAddr.line1 || '';
+                    document.getElementById('manualLine2')?.value = defaultAddr.line2 || '';
+                    document.getElementById('manualCity')?.value = defaultAddr.city || '';
+                    document.getElementById('manualState')?.value = defaultAddr.state || '';
+                    document.getElementById('manualPostal')?.value = defaultAddr.postal || '';
+                    document.getElementById('manualCountry')?.value = defaultAddr.country || '';
+                }
+            }
+
+
+            // ========================================
+            // CHECKOUT: Reuse addresses.js AddressManager
+            // ========================================
+            // In checkout script, add:
+            if (typeof window.addressManager === 'undefined') {
+                console.error('❌ addressManager not found! Check:');
+                console.log('  - addresses.js loaded?', document.querySelector('script[src="/js/addresses.js"]'));
+                console.log('  - window.addressManager?', window.addressManager);
+            }
+
+            // Only run on checkout page
+            if (window.location.pathname !== '/cart/checkout') return;
+
+            const addAddressBtn = document.getElementById('checkoutAddAddressBtn');
+
+            if (addAddressBtn) {
+                addAddressBtn.addEventListener('click', async () => {
+                    // ✅ Wait for addressManager to be ready (loaded from addresses.js)
+                    if (typeof window.addressManager === 'undefined') {
+                        console.warn('⏳ Waiting for addressManager to load...');
+                        // Retry after short delay
+                        setTimeout(() => addAddressBtn.click(), 100);
+                        return;
+                    }
+
+                    // ✅ Reuse existing showAddModal from addresses.js
+                    window.addressManager.showAddModal();
+
+                    // ✅ Set a flag so saveAddress knows this is checkout context
+                    window.addressManager.checkoutContext = true;
+
+                    // ✅ Override saveAddress temporarily to handle checkout flow
+                    const originalSave = window.addressManager.saveAddress;
+                    window.addressManager.saveAddress = async function (formData) {
+                        // Mark as checkout address (auto-select as default for this order)
+                        formData.isDefault = true;
+
+                        // Call original save logic (with password verification)
+                        await originalSave.call(this, formData);
+
+                        // After save succeeds, update checkout UI
+                        this.checkoutContext = false;
+                        window.addressManager.saveAddress = originalSave; // Restore original
+                    };
+                });
+            }
+
+            // ✅ Listen for address updates to refresh checkout selection
+            document.addEventListener('addressesUpdated', (e) => {
+                if (window.addressManager?.checkoutContext) return; // Skip if mid-save
+
+                // Refresh address selection in checkout
+                refreshCheckoutAddressSelection();
+            });
+
+            // ✅ Refresh checkout address selection with latest addresses
+            const refreshCheckoutAddressSelection = async () => {
+                try {
+                    // Fetch fresh addresses from API
+                    const token = localStorage.getItem('jwtToken') || sessionStorage.getItem('jwtToken');
+                    const response = await fetch(`${window.location.origin}/api/user/addresses`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        credentials: 'include'
+                    });
+
+                    if (!response.ok) return;
+
+                    const data = await response.json();
+                    const addresses = data.addresses || [];
+
+                    // Find the most recently added address (last in array)
+                    const newAddress = addresses[addresses.length - 1];
+                    if (!newAddress) return;
+
+                    // Update checkout UI to select new address
+                    updateAddressSelectionUI(newAddress);
+
+                } catch (error) {
+                    console.warn('Could not refresh checkout addresses:', error);
+                }
+            };
+
+            // ✅ Update the address selection UI with new address
+            const updateAddressSelectionUI = (address) => {
+                const addressSelection = document.querySelector('.address-selection');
+                if (!addressSelection) return;
+
+                const addressId = String(address._id);
+
+                // Unselect all existing options
+                addressSelection.querySelectorAll('input[name="shippingAddress"]').forEach(radio => {
+                    radio.checked = false;
+                    radio.closest('.address-option')?.classList.remove('selected');
+                });
+
+                // Create or update option for new address
+                let option = addressSelection.querySelector(`input[value="${addressId}"]`)?.closest('.address-option');
+
+                if (!option) {
+                    // Create new option
+                    option = document.createElement('label');
+                    option.className = 'address-option selected';
+                    option.innerHTML = `
+                <input type="radio" name="shippingAddress" value="${addressId}" checked
+                    data-address='${JSON.stringify(address).replace(/'/g, "\\'")}'>
+                <div class="address-option-content">
+                    <div class="address-option-header">
+                        <strong>${address.label || 'Address'}</strong>
+                        ${address.isDefault ? '<span class="default-badge">Default</span>' : ''}
+                    </div>
+                    <p class="address-option-body">
+                        ${address.name}<br>
+                        ${address.line1}${address.line2 ? `, ${address.line2}` : ''}<br>
+                        ${address.city}, ${address.state} ${address.postal}<br>
+                        ${address.country}<br>
+                        📱 ${address.phone}
+                    </p>
+                </div>
+            `;
+                    // Insert at top
+                    addressSelection.insertBefore(option, addressSelection.firstChild);
+                } else {
+                    // Select existing option
+                    option.querySelector('input').checked = true;
+                    option.classList.add('selected');
+                }
+
+                // Update button text
+                const useBtn = document.getElementById('checkoutAddAddressBtn');
+                if (useBtn) {
+                    useBtn.textContent = '← Use Saved Address';
+                    useBtn.onclick = () => {
+                        // Toggle view back to saved addresses
+                        addressSelection.querySelectorAll('.address-option').forEach(opt => {
+                            opt.style.display = 'flex';
+                        });
+                        useBtn.style.display = 'none';
+                    };
+                }
+            };
+
+});
+        </script>

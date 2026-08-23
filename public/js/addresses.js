@@ -1,16 +1,15 @@
 // ========================================
 // ADDRESSES MANAGEMENT - addresses.js
-// Handles CRUD operations with password verification
+// ONLY runs on /user/profile, NO redirects
 // ========================================
 
 class AddressManager {
   constructor() {
-    this.API_BASE = `http://${window.location.hostname}:4000`;
+    this.API_BASE = `http://${window.location.hostname}:4000/api`;
     this.addresses = [];
-    this.pendingAction = null; // Stores action awaiting password verification
+    this.pendingAction = null;
   }
 
-  // 🔐 Get auth headers for API calls
   getAuthHeaders() {
     const token =
       localStorage.getItem("jwtToken") || sessionStorage.getItem("jwtToken");
@@ -21,7 +20,7 @@ class AddressManager {
     };
   }
 
-  // 📦 Generic API request helper
+  // ✅ FIX: NO REDIRECTS - just throw error for caller to handle
   async request(url, options = {}) {
     const response = await fetch(url, {
       credentials: "include",
@@ -29,38 +28,30 @@ class AddressManager {
       ...options,
     });
 
-    if (response.status === 401) {
-      // Token expired → redirect to login
-      localStorage.removeItem("jwtToken");
-      sessionStorage.removeItem("jwtToken");
-      window.location.href =
-        "/user/login?redirect=" + encodeURIComponent(window.location.pathname);
-      return null;
-    }
-
     if (!response.ok) {
       const err = await response.json().catch(() => ({}));
+      // ✅ Just throw - don't redirect
       throw new Error(err.message || `HTTP ${response.status}`);
     }
 
     return response.json();
   }
 
-  // 🔄 Fetch user addresses from backend
   async fetchAddresses() {
     try {
       const data = await this.request(`${this.API_BASE}/user/addresses`, {
         method: "GET",
       });
-      this.addresses = data.addresses || [];
+      this.addresses = data?.addresses || [];
       return this.addresses;
     } catch (error) {
-      console.error("Failed to fetch addresses:", error);
+      // ✅ Log but don't crash
+      console.warn("⚠️ Could not fetch addresses:", error.message);
+      this.addresses = [];
       return [];
     }
   }
 
-  // 🎨 Render addresses to DOM
   render() {
     const list = document.getElementById("addressesList");
     const noAddresses = document.getElementById("noAddresses");
@@ -76,19 +67,14 @@ class AddressManager {
     if (noAddresses) noAddresses.style.display = "none";
 
     list.innerHTML = this.addresses
-      .map(
-        (addr) => `
-      <div class="address-card ${addr.isDefault ? "default" : ""}" data-address-id="${addr._id}">
+      .map((addr) => {
+        const addressId = String(addr._id);
+        return `
+      <div class="address-card ${addr.isDefault ? "default" : ""}" data-address-id="${addressId}">
         ${addr.isDefault ? '<span class="default-badge">Default</span>' : ""}
-        
         <div class="address-card-header">
           <h5 class="address-card-title">${addr.label || "Address"} ${addr.isDefault ? "• Default" : ""}</h5>
-          <div class="address-card-actions">
-            <button class="edit-address-btn" data-id="${addr._id}">✏️ Edit</button>
-            <button class="delete-address-btn delete-btn" data-id="${addr._id}">🗑️ Delete</button>
-          </div>
         </div>
-        
         <div class="address-card-body">
           <p><strong>${addr.name}</strong></p>
           <p>${addr.line1}${addr.line2 ? `<br>${addr.line2}` : ""}</p>
@@ -96,75 +82,121 @@ class AddressManager {
           <p>${addr.country}</p>
           <p>📱 ${addr.phone}</p>
         </div>
-      </div>
-    `,
-      )
+        <div class="address-card-actions">
+            <button class="edit-address-btn" data-id="${addressId}">✏️ Edit</button>
+            <button class="delete-address-btn delete-btn" data-id="${addressId}">🗑️ Delete</button>
+          </div>
+      </div>`;
+      })
       .join("");
 
-    // Add event listeners to buttons
+    // Add accordion toggle for mobile
+    list.querySelectorAll(".address-card").forEach((card) => {
+      if (window.innerWidth <= 768) {
+        const header = card.querySelector(".address-card-header");
+        if (header) {
+          header.style.cursor = "pointer";
+          header.addEventListener("click", () => {
+            card.classList.toggle("expanded");
+          });
+        }
+      }
+    });
+
+    // Event listeners for edit/delete
     list.querySelectorAll(".edit-address-btn").forEach((btn) => {
-      btn.addEventListener("click", (e) => {
-        const id = e.currentTarget.dataset.id;
-        this.editAddress(id);
-      });
+      btn.addEventListener("click", (e) =>
+        this.editAddress(e.currentTarget.dataset.id),
+      );
     });
-
     list.querySelectorAll(".delete-address-btn").forEach((btn) => {
-      btn.addEventListener("click", (e) => {
-        const id = e.currentTarget.dataset.id;
-        this.deleteAddress(id);
-      });
+      btn.addEventListener("click", (e) =>
+        this.deleteAddress(e.currentTarget.dataset.id),
+      );
     });
+
+    // ✅ FIX: Call updateAddressStats AFTER rendering
+    this.updateAddressStats();
   }
 
-  // ➕ Show modal to add new address
+  // After render(), update address count:
+  updateAddressStats = () => {
+    // ✅ Update address count in profile card
+    const countEl = document.getElementById("addressCount");
+    if (countEl) {
+      countEl.textContent = this.addresses.length;
+    }
+
+    // ✅ Dispatch event for profile.js to listen
+    document.dispatchEvent(
+      new CustomEvent("addressesUpdated", {
+        detail: { count: this.addresses.length },
+      }),
+    );
+  };
+
   showAddModal() {
-    document.getElementById("addressModalTitle").textContent =
-      "Add New Address";
-    document.getElementById("addressForm").reset();
-    document.getElementById("addressId").value = "";
-    document.getElementById("addressModal").style.display = "flex";
+    const modal = document.getElementById("addressModal");
+    const title = document.getElementById("addressModalTitle");
+    const form = document.getElementById("addressForm");
+    const idField = document.getElementById("addressId");
+
+    if (!modal || !title || !form || !idField) return; // ✅ Safe exit
+
+    title.textContent = "Add New Address";
+    form.reset();
+    idField.value = "";
+    modal.style.display = "flex";
   }
 
-  // ✏️ Show modal to edit existing address
   async editAddress(addressId) {
-    const address = this.addresses.find((a) => a._id === addressId);
+    const address = this.addresses.find(
+      (a) => String(a._id) === String(addressId),
+    );
     if (!address) return;
 
-    document.getElementById("addressModalTitle").textContent = "Edit Address";
-    document.getElementById("addressId").value = address._id;
-    document.getElementById("addressLabel").value = address.label || "";
-    document.getElementById("addressName").value = address.name || "";
-    document.getElementById("addressLine1").value = address.line1 || "";
-    document.getElementById("addressLine2").value = address.line2 || "";
-    document.getElementById("addressCity").value = address.city || "";
-    document.getElementById("addressState").value = address.state || "";
-    document.getElementById("addressPostal").value = address.postal || "";
-    document.getElementById("addressCountry").value = address.country || "";
-    document.getElementById("addressPhone").value = address.phone || "";
-    document.getElementById("addressDefault").checked =
-      address.isDefault || false;
+    const modal = document.getElementById("addressModal");
+    const title = document.getElementById("addressModalTitle");
+    const idField = document.getElementById("addressId");
 
-    document.getElementById("addressModal").style.display = "flex";
+    if (!modal || !title || !idField) return;
+
+    title.textContent = "Edit Address";
+    idField.value = address._id;
+
+    // Safe setter helper
+    const setVal = (id, val) => {
+      const el = document.getElementById(id);
+      if (el) el.value = val || "";
+    };
+
+    setVal("addressLabel", address.label);
+    setVal("addressName", address.name);
+    setVal("addressLine1", address.line1);
+    setVal("addressLine2", address.line2);
+    setVal("addressCity", address.city);
+    setVal("addressState", address.state);
+    setVal("addressPostal", address.postal);
+    setVal("addressCountry", address.country);
+    setVal("addressPhone", address.phone);
+
+    const defaultCheck = document.getElementById("addressDefault");
+    if (defaultCheck) defaultCheck.checked = address.isDefault || false;
+
+    modal.style.display = "flex";
   }
 
-  // 🗑️ Delete address (requires password verification)
   async deleteAddress(addressId) {
     if (!confirm("Are you sure you want to delete this address?")) return;
-
-    // Store pending action and show password modal
     this.pendingAction = { type: "delete", addressId };
     this.showPasswordModal();
   }
 
-  // 💾 Save address (add or update, requires password verification)
   async saveAddress(formData) {
-    // Store pending action and show password modal
     this.pendingAction = { type: "save", formData };
     this.showPasswordModal();
   }
 
-  // 🔐 Show password verification modal (reuses existing modal from profile.js)
   showPasswordModal() {
     const modal = document.getElementById("passwordModal");
     const passwordError = document.getElementById("passwordError");
@@ -177,11 +209,10 @@ class AddressManager {
     }
     if (modal) {
       modal.style.display = "flex";
-      document.body.style.overflow = "hidden";
+      document.body.style.overflow = "scroll";
     }
   }
 
-  // 🔐 Hide password modal
   hidePasswordModal() {
     const modal = document.getElementById("passwordModal");
     if (modal) {
@@ -191,14 +222,12 @@ class AddressManager {
     this.pendingAction = null;
   }
 
-  // ✅ Execute pending action after password verification
   async executePendingAction(password) {
     if (!this.pendingAction) return;
-
     const { type, addressId, formData } = this.pendingAction;
 
     try {
-      // 🔐 Step 1: Verify password
+      // Verify password
       const verifyResponse = await fetch(
         `${this.API_BASE}/user/verify-password`,
         {
@@ -214,7 +243,7 @@ class AddressManager {
         throw new Error(err.message || "Password verification failed");
       }
 
-      // ✅ Step 2: Execute the actual action
+      // Execute action
       if (type === "delete") {
         await this.request(`${this.API_BASE}/user/addresses/${addressId}`, {
           method: "DELETE",
@@ -225,27 +254,22 @@ class AddressManager {
         const url = formData._id
           ? `${this.API_BASE}/user/addresses/${formData._id}`
           : `${this.API_BASE}/user/addresses`;
-
-        await this.request(url, {
-          method,
-          body: JSON.stringify(formData),
-        });
+        await this.request(url, { method, body: JSON.stringify(formData) });
         showMessage(
           formData._id ? "✅ Address updated" : "✅ Address added",
           "success",
         );
       }
 
-      // ✅ Step 3: Refresh and re-render
+      // Refresh
       await this.fetchAddresses();
       this.render();
       this.hidePasswordModal();
 
-      // Close address modal if open
       const addressModal = document.getElementById("addressModal");
       if (addressModal) addressModal.style.display = "none";
     } catch (error) {
-      console.error("Address action failed:", error);
+      console.error("❌ Address action failed:", error.message);
       const passwordError = document.getElementById("passwordError");
       if (passwordError) {
         passwordError.textContent =
@@ -256,7 +280,6 @@ class AddressManager {
     }
   }
 
-  // 🎯 Initialize: fetch and render addresses on load
   async init() {
     await this.fetchAddresses();
     this.render();
@@ -264,38 +287,35 @@ class AddressManager {
 }
 
 // ========================================
-// GLOBAL INSTANCE & INITIALIZATION
+// INITIALIZATION - ONLY ON /user/profile
 // ========================================
-let addressManager;
 
 document.addEventListener("DOMContentLoaded", async () => {
-  // Only initialize on profile page
+  // ✅ CRITICAL: Only run on profile page
   if (window.location.pathname !== "/user/profile") return;
+
+  // ✅ Wait for addressesList to exist
+  if (!document.getElementById("addressesList")) return;
 
   addressManager = new AddressManager();
   await addressManager.init();
-  window.addressManager = addressManager; // Expose globally for debugging
+  window.addressManager = addressManager;
 
-  // 🎯 Add Address Button
+  // Safe event bindings
   const addBtn = document.getElementById("addAddressBtn");
-  if (addBtn) {
-    addBtn.addEventListener("click", () => {
-      addressManager.showAddModal();
-    });
-  }
+  if (addBtn)
+    addBtn.addEventListener("click", () => addressManager?.showAddModal());
 
-  // 🎯 Address Modal Close Handlers
   const closeAddressModal = document.getElementById("closeAddressModal");
   const cancelAddressModal = document.getElementById("cancelAddressModal");
   const addressModal = document.getElementById("addressModal");
 
   [closeAddressModal, cancelAddressModal].forEach((btn) => {
-    if (btn) {
+    if (btn)
       btn.addEventListener("click", () => {
         if (addressModal) addressModal.style.display = "none";
         document.body.style.overflow = "";
       });
-    }
   });
 
   if (addressModal) {
@@ -307,25 +327,25 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  // 💾 Save Address Button Handler
   const saveAddressBtn = document.getElementById("saveAddressBtn");
   if (saveAddressBtn) {
     saveAddressBtn.addEventListener("click", async () => {
+      const getVal = (id) => document.getElementById(id)?.value.trim() || "";
+
       const formData = {
-        _id: document.getElementById("addressId").value || undefined,
-        label: document.getElementById("addressLabel").value.trim(),
-        name: document.getElementById("addressName").value.trim(),
-        line1: document.getElementById("addressLine1").value.trim(),
-        line2: document.getElementById("addressLine2").value.trim(),
-        city: document.getElementById("addressCity").value.trim(),
-        state: document.getElementById("addressState").value.trim(),
-        postal: document.getElementById("addressPostal").value.trim(),
-        country: document.getElementById("addressCountry").value.trim(),
-        phone: document.getElementById("addressPhone").value.trim(),
-        isDefault: document.getElementById("addressDefault").checked,
+        _id: getVal("addressId") || undefined,
+        label: getVal("addressLabel"),
+        name: getVal("addressName"),
+        line1: getVal("addressLine1"),
+        line2: getVal("addressLine2"),
+        city: getVal("addressCity"),
+        state: getVal("addressState"),
+        postal: getVal("addressPostal"),
+        country: getVal("addressCountry"),
+        phone: getVal("addressPhone"),
+        isDefault: document.getElementById("addressDefault")?.checked || false,
       };
 
-      // Basic validation
       if (
         !formData.name ||
         !formData.line1 ||
@@ -336,53 +356,43 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
       }
 
-      // Show password verification before saving
-      await addressManager.saveAddress(formData);
+      await addressManager?.saveAddress(formData);
     });
   }
 
-  // 🔐 Integrate with existing password modal confirm button
+  // Integrate with password modal confirm
   const confirmPasswordVerify = document.getElementById(
     "confirmPasswordVerify",
   );
   if (confirmPasswordVerify) {
-    // Store original handler to chain with address actions
     const originalHandler = confirmPasswordVerify.onclick;
-
     confirmPasswordVerify.addEventListener("click", async () => {
       const password = document.getElementById("verifyPassword")?.value;
-
-      // If there's a pending address action, execute it
       if (addressManager?.pendingAction && password) {
         try {
           await addressManager.executePendingAction(password);
         } catch (error) {
-          // Error already shown in executePendingAction
+          // Error already shown
         }
       } else if (originalHandler) {
-        // Fall back to original profile update handler
         originalHandler();
       }
     });
   }
 });
 
-// 🎨 Helper: Show message (reuse from profile.js if available)
+// Safe message helper
 function showMessage(text, type = "error") {
-  // Try to use existing message box from profile.js
   const box = document.getElementById("messageBox");
   if (box) {
     box.textContent = text;
     box.className = `message-box ${type}`;
     box.style.display = "block";
-
     if (type === "success") {
-      setTimeout(() => {
-        box.style.display = "none";
-      }, 4000);
+      setTimeout(() => (box.style.display = "none"), 4000);
     }
   } else {
-    // Fallback: simple alert
-    alert(`${type === "error" ? "❌" : "✅"} ${text}`);
+    // ✅ Fallback: console log instead of alert (won't block navigation)
+    console.log(`[Addresses] ${type.toUpperCase()}: ${text}`);
   }
 }

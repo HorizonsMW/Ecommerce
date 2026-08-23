@@ -4,6 +4,7 @@ const asyncHandler = require("express-async-handler");
 const { validateMongoDbId } = require("../utils/validateMongodbId");
 const { generaterefreshToken } = require("../config/refreshtoken");
 const jwt = require("jsonwebtoken");
+const mongoose = require("mongoose");
 
 //create user function
 const createUser = asyncHandler(async (req, res) => {
@@ -33,7 +34,7 @@ const loginUserCtrl = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
   //console.log(email,password);
   //check if user exists
-  const findUser = await User.findOne({ email }).select('+password'); //true or false
+  const findUser = await User.findOne({ email }).select("+password"); //true or false
   //console.log(findUser) //return user with inpute email
 
   if (findUser && (await findUser.isPasswordMatched(password))) {
@@ -137,7 +138,7 @@ const logout = asyncHandler(async (req, res) => {
   if (refreshToken) {
     // 🔑 KEY DIFFERENCE 2: Also invalidate refreshToken in database
     await User.findOneAndUpdate(
-      { refreshToken: cleanRefreshToken  }, // Find user with this refresh token
+      { refreshToken: cleanRefreshToken }, // Find user with this refresh token
       { refreshToken: "" }, // Clear it
     );
     res.clearCookie("refreshToken", cookieOptions);
@@ -165,7 +166,6 @@ const logout = asyncHandler(async (req, res) => {
 const updateAUser = asyncHandler(async (req, res) => {
   const userId = req.user._id.toString();
   validateMongoDbId(userId);
-  // Inside updateAUser, before findByIdAndUpdate:
   if (req.body.email && req.body.email !== req.user.email) {
     const existing = await User.findOne({ email: req.body.email });
     if (existing) {
@@ -184,10 +184,11 @@ const updateAUser = asyncHandler(async (req, res) => {
       {
         new: true,
       },
-    ).select('-password -refreshToken'); //exlude password and token
+    ).select("-password -refreshToken"); //exlude password and token
     res.json(updateUser);
   } catch (error) {
-    throw new Error(error);
+    //throw new Error(error);
+    console.error("UPdate issue",error)
   }
 });
 //get all users
